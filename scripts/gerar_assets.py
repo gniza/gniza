@@ -312,6 +312,11 @@ STACK = [
 PRINCIPAL = "Claude Code"
 PRINCIPAL_SUB = "meu parceiro de programação no terminal"
 PRINCIPAL_CMD = '> claude "cria o site e deixa bonito"'
+# ferramentas secundárias (nome, cor, ícone: "estrela" ou "anel")
+SECUNDARIAS = [
+    ("Gemini", "#8e7cf0", "estrela"),
+    ("ChatGPT", "#10a37f", "anel"),
+]
 
 
 def stack():
@@ -366,8 +371,32 @@ def stack():
         o += (f'<text x="{mx + dx}" y="{fy + dy}" {MONO} font-size="{fs}" fill="{OR}">✻'
               f'<animate attributeName="opacity" values="0;1;0" dur="2.2s" begin="{-k*.55:.2f}s" repeatCount="indefinite"/></text>')
 
-    # ---------- demais ferramentas ----------
+    # ---------- secundárias ----------
     ly = fy + fh + 44
+    o += f'<text x="{fx}" y="{ly}" {MONO} font-size="14" fill="{DIM}">└ ferramentas secundárias</text>'
+    sh, sg = 96, 20
+    sw = (fw - sg) / 2
+    for i, (name, col, icon) in enumerate(SECUNDARIAS):
+        x, y = fx + i * (sw + sg), ly + 20
+        if icon == "estrela":
+            pts = "0,-22 5,-5 22,0 5,5 0,22 -5,5 -22,0 -5,-5"
+            ic = (f'<polygon points="{pts}" fill="url(#gem)"><animateTransform attributeName="transform" type="rotate" '
+                  f'values="0;90;90" keyTimes="0;.3;1" dur="4s" repeatCount="indefinite"/></polygon>')
+        else:
+            ic = (f'<circle r="16" fill="none" stroke="{col}" stroke-width="5" stroke-dasharray="20 5.1">'
+                  f'<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite"/></circle>'
+                  f'<circle r="5" fill="{col}"/>')
+        card = (f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{PANEL}" stroke="{col}" stroke-opacity=".55" stroke-width="1.5"/>'
+                f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{col}" opacity=".06"/>'
+                f'<g transform="translate(52,{sh/2})">{ic}</g>'
+                f'<text x="96" y="{sh/2 - 4}" {SERIF} font-size="30" fill="{CREAM}">{esc(name)}</text>'
+                f'<text x="98" y="{sh/2 + 22}" {MONO} font-size="14" fill="{MUTED}">assistente de IA</text>'
+                f'<rect x="{sw - 148:.0f}" y="{sh/2 - 14}" width="122" height="28" rx="14" fill="none" stroke="{MUTED}" stroke-opacity=".6"/>'
+                f'<text x="{sw - 87:.0f}" y="{sh/2 + 5}" text-anchor="middle" {MONO} font-size="12" font-weight="700" fill="{MUTED}" letter-spacing="1.2">SECUNDÁRIA</text>')
+        o += f'<g transform="translate({x:.0f},{y})">{bob(card, 3, 2.6 + i * .5)}</g>'
+
+    # ---------- demais ferramentas ----------
+    ly = ly + 20 + sh + 44
     o += f'<text x="{fx}" y="{ly}" {MONO} font-size="14" fill="{DIM}">└ outras ferramentas</text>'
     top = ly + 22
     rows = math.ceil(len(STACK) / cols)
@@ -391,6 +420,8 @@ def stack():
             + '<filter id="soft" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>'
             + f'<radialGradient id="rg" cx=".12" cy=".5" r=".6"><stop offset="0" stop-color="{OR}" stop-opacity=".22"/>'
               f'<stop offset="1" stop-color="{OR}" stop-opacity="0"/></radialGradient>'
+            + '<linearGradient id="gem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285f4"/>'
+              '<stop offset=".55" stop-color="#9b72cb"/><stop offset="1" stop-color="#d96570"/></linearGradient>'
             + f'<linearGradient id="bar" x1="0" x2="1"><stop offset="0" stop-color="{OR_D}"/><stop offset="1" stop-color="{MANILLA}"/></linearGradient>')
     save("stack.svg", svg(W, H, o, defs))
 
