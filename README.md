@@ -1,13 +1,13 @@
 <div align="center">
 
-<img src="assets/hero.svg" alt="Terminal do Claude Code apresentando Gabriel Niza, desenvolvedor web em Rolândia-PR" width="100%">
+<img src="assets/hero.svg" alt="Terminal do Claude Code apresentando Gabriel Niza, desenvolvedor web" width="100%">
 
 <br><br>
 
-<img src="https://img.shields.io/badge/local-Rol%C3%A2ndia--PR-d97757?style=for-the-badge&labelColor=141413" alt="Rolândia-PR">
+<img src="https://img.shields.io/badge/foco-front--end-d97757?style=for-the-badge&labelColor=141413" alt="Foco em front-end">
 <img src="https://img.shields.io/badge/feito_com-Claude_Code-d97757?style=for-the-badge&logo=claude&logoColor=d97757&labelColor=141413" alt="Feito com Claude Code">
 <img src="https://img.shields.io/badge/status-dispon%C3%ADvel-8cc084?style=for-the-badge&labelColor=141413" alt="Disponível para projetos">
-<img src="https://komarev.com/ghpvc/?username=gniza&label=visitas&color=d97757&style=for-the-badge&labelColor=141413" alt="Visitas ao perfil">
+<img src="https://komarev.com/ghpvc/?username=gniza&base=834&label=visitas&color=d97757&style=for-the-badge&labelColor=141413" alt="Visitas ao perfil">
 
 <img src="assets/clawd-walk.svg" alt="" width="100%">
 
@@ -16,7 +16,7 @@
 <img src="assets/titulo-sobre.svg" alt="Sobre mim" width="100%">
 
 <div align="center">
-<img src="assets/claude-md.svg" alt="CLAUDE.md: Gabriel Niza, desenvolvedor web em Rolândia-PR que cria sites e cardápios online para negócios locais" width="100%">
+<img src="assets/claude-md.svg" alt="CLAUDE.md: Gabriel Niza, desenvolvedor web que cria sites e cardápios online para negócios locais" width="100%">
 </div>
 
 <img src="assets/titulo-stack.svg" alt="Ferramentas" width="100%">

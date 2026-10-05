@@ -133,10 +133,10 @@ def stars(w, h, n, y0=60):
 # ======================================================= 1. terminal (hero)
 # CONTEÚDO
 HERO_NAME = "Gabriel Niza"
-HERO_SUB = "desenvolvedor web · Rolândia-PR · vibe coding com Claude"
+HERO_SUB = "desenvolvedor web · front-end · vibe coding com Claude"
 PERGUNTA = "> me conta sobre o Gabriel"
 RESPOSTAS = [
-    ("●", "Desenvolvedor web em Rolândia, Paraná"),
+    ("●", "Desenvolvedor web apaixonado por front-end"),
     ("●", "Cria sites e cardápios online para negócios locais"),
     ("●", "Pedidos pelo WhatsApp, mobile-first e visual caprichado"),
     ("●", "Programa em parceria com o Claude Code"),
@@ -251,7 +251,7 @@ CLAUDE_MD = [
     ("quote", "> Desenvolvedor web que transforma ideias em sites rápidos e bonitos."),
     ("blank", ""),
     ("h2", "## Sobre"),
-    ("li", "Moro em Rolândia, Paraná — Brasil"),
+    ("li", "Foco em front-end e experiência mobile"),
     ("li", "Crio sites e cardápios online para negócios locais"),
     ("li", "Aprendendo: Next.js, Supabase e animações em SVG"),
     ("blank", ""),
@@ -336,7 +336,7 @@ def stack():
 # CONTEÚDO (repo, linguagem, cor, descrição)
 PROJETOS = [
     ("agrovic-site", "TypeScript", "#3178c6", "Pedidos pelo WhatsApp para casa de ração, farmácia e consultório veterinário."),
-    ("costelao-pedidos", "TypeScript", "#3178c6", "Cardápio mobile-first do Restaurante O Costelão, de Rolândia-PR."),
+    ("costelao-pedidos", "TypeScript", "#3178c6", "Cardápio mobile-first do Restaurante O Costelão, com pedido pelo WhatsApp."),
     ("studiohairhousebarber", "TypeScript", "#3178c6", "Site moderno para o Studio Hair House Barber."),
     ("DomBoscoPage", "HTML", "#e34f26", "Página institucional Dom Bosco."),
     ("SitePontoPet", "CSS", "#2965f1", "Site do pet shop Ponto Pet."),
