@@ -22,7 +22,7 @@
 <img src="assets/titulo-stack.svg" alt="Ferramentas" width="100%">
 
 <div align="center">
-<img src="assets/stack.svg" alt="Ferramenta principal: Claude Code. Secundárias: Gemini e ChatGPT. Design e marketing: TryBloom e especialista em tráfego na Shopee. Outras ferramentas: HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Tailwind, Supabase, Vercel, Git e Figma" width="100%">
+<img src="assets/stack.svg" alt="Ferramenta principal: Claude Code. Secundárias: Gemini e ChatGPT. Design e marketing: TryBloom e especialista em tráfego com IA na Shopee. Outras ferramentas: HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Tailwind, Supabase, Vercel, Git e Figma" width="100%">
 </div>
 
 <img src="assets/titulo-projetos.svg" alt="Projetos em destaque" width="100%">

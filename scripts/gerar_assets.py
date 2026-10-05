@@ -319,7 +319,7 @@ SECUNDARIAS = [
 ]
 DESIGN_MARKETING = [
     ("TryBloom", "design de marca com IA", "#9d4edd", "trybloom", "DESIGN", "#c08cf0"),
-    ("Shopee", "especialista em tráfego", "#ee4d2d", "shopee", "ESPECIALIDADE", "#ff7a5c"),
+    ("Shopee", "especialista em tráfego com IA", "#ee4d2d", "shopee", "ESPECIALIDADE", "#ff7a5c"),
 ]
 
 
