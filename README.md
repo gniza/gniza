@@ -13,12 +13,6 @@
 
 </div>
 
-<img src="assets/titulo-nizashop.svg" alt="Minha loja" width="100%">
-
-<div align="center">
-<a href="nizashop/"><img src="assets/loja-nizashop.svg" alt="NizaShop, loja na Shopee. Gabriel Niza, fundador e CEO. Clique para conhecer a loja" width="100%"></a>
-</div>
-
 <img src="assets/titulo-sobre.svg" alt="Sobre mim" width="100%">
 
 <div align="center">
@@ -29,6 +23,12 @@
 
 <div align="center">
 <img src="assets/stack.svg" alt="Ferramenta principal: Claude Code. Secundárias: Gemini e ChatGPT. Design e marketing: TryBloom e especialista em tráfego com IA na Shopee. Outras ferramentas: HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Tailwind, Supabase, Vercel, Git e Figma" width="100%">
+</div>
+
+<img src="assets/titulo-nizashop.svg" alt="Minha loja" width="100%">
+
+<div align="center">
+<a href="nizashop/"><img src="assets/loja-nizashop.svg" alt="NizaShop, loja na Shopee. Gabriel Niza, fundador e CEO. Clique para conhecer a loja" width="100%"></a>
 </div>
 
 <img src="assets/titulo-projetos.svg" alt="Projetos em destaque" width="100%">
