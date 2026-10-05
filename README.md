@@ -22,7 +22,7 @@
 <img src="assets/titulo-stack.svg" alt="Ferramentas" width="100%">
 
 <div align="center">
-<img src="assets/stack.svg" alt="HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Tailwind, Supabase, Vercel, Git, Figma e Claude Code" width="100%">
+<img src="assets/stack.svg" alt="Ferramenta principal: Claude Code. Outras ferramentas: HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Tailwind, Supabase, Vercel, Git e Figma" width="100%">
 </div>
 
 <img src="assets/titulo-projetos.svg" alt="Projetos em destaque" width="100%">

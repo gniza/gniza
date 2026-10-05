@@ -306,30 +306,93 @@ STACK = [
     ("HTML5", "#e34f26"), ("CSS3", "#2965f1"), ("JavaScript", "#f7df1e"),
     ("TypeScript", "#3178c6"), ("React", "#61dafb"), ("Next.js", "#f0eee6"),
     ("Tailwind", "#38bdf8"), ("Supabase", "#3ecf8e"), ("Vercel", "#f0eee6"),
-    ("Git", "#f05032"), ("Figma", "#a259ff"), ("Claude Code", OR),
+    ("Git", "#f05032"), ("Figma", "#a259ff"),
 ]
+# ferramenta principal (card em destaque)
+PRINCIPAL = "Claude Code"
+PRINCIPAL_SUB = "meu parceiro de programação no terminal"
+PRINCIPAL_CMD = '> claude "cria o site e deixa bonito"'
 
 
 def stack():
     W, cols, cw, ch, gx, gy = 1200, 6, 168, 64, 20, 22
+    fx, fy, fw, fh = 45, 84, W - 90, 244
+    o = window_chrome(W, "/stack")
+
+    # ---------- card principal ----------
+    o += (f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="20" fill="none" stroke="{OR}" stroke-width="10" '
+          f'filter="url(#soft)" opacity=".35"><animate attributeName="opacity" values=".15;.5;.15" dur="3s" repeatCount="indefinite"/></rect>')
+    o += f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="20" fill="{PANEL}"/>'
+    o += f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="20" fill="url(#rg)"/>'
+    o += f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="20" fill="none" stroke="url(#bd2)" stroke-width="2.5"/>'
+    o += f'<g filter="url(#glow)">{spark(fx + 112, fy + fh / 2, 1.05, 18)}</g>'
+    tx = fx + 222
+    o += (f'<rect x="{tx}" y="{fy + 24}" width="232" height="28" rx="14" fill="{OR}" fill-opacity=".15" stroke="{OR}" stroke-opacity=".7"/>'
+          f'<text x="{tx + 116}" y="{fy + 43}" text-anchor="middle" {MONO} font-size="13" font-weight="700" fill="{OR}" letter-spacing="1.5">'
+          f'★ FERRAMENTA PRINCIPAL<animate attributeName="opacity" values="1;.55;1" dur="2s" repeatCount="indefinite"/></text>')
+    o += f'<text x="{tx - 2}" y="{fy + 104}" {SERIF} font-size="58" fill="{CREAM}" letter-spacing="-1">{esc(PRINCIPAL)}</text>'
+    o += f'<text x="{tx}" y="{fy + 138}" {MONO} font-size="17" fill="{MUTED}">{esc(PRINCIPAL_SUB)}</text>'
+    # comando digitado em loop
+    T, n = 8.0, len(PRINCIPAL_CMD)
+    w = n * 9.7 + 6
+    times, vals = [0], [0]
+    for k in range(1, n + 1):
+        times.append(.4 + (k - 1) * 2.2 / n)
+        vals.append(round(w * k / n, 1))
+    times += [7.4, T]
+    vals += [0, 0]
+    kt = ";".join(f"{t/T:.4f}" for t in times[:-1]) + ";1"
+    cy = fy + 180
+    o += (f'<clipPath id="cmd"><rect x="{tx}" y="{cy - 20}" height="28" width="{w:.0f}">'
+          f'<animate attributeName="width" calcMode="discrete" dur="{T}s" repeatCount="indefinite" '
+          f'keyTimes="{kt}" values="{";".join(map(str, vals))}"/></rect></clipPath>')
+    o += (f'<text x="{tx}" y="{cy}" {MONO} font-size="16" fill="{CREAM}" clip-path="url(#cmd)" xml:space="preserve">'
+          f'<tspan fill="{OR}">&gt;</tspan>{esc(PRINCIPAL_CMD[1:])}</text>')
+    o += (f'<text x="{tx + w + 14:.0f}" y="{cy}" {MONO} font-size="16" fill="{GREEN}">✔ feito'
+          f'<animate attributeName="opacity" dur="{T}s" repeatCount="indefinite" keyTimes="0;{3/T:.3f};{3.2/T:.3f};{7.3/T:.3f};{7.4/T:.3f};1" values="0;0;1;1;0;0"/></text>')
+    # medidor de uso
+    my = fy + 206
+    o += f'<text x="{tx}" y="{my + 11}" {MONO} font-size="13" fill="{DIM}">uso diário</text>'
+    o += f'<rect x="{tx + 100}" y="{my}" width="300" height="12" rx="6" fill="{BG}" stroke="{BORDER}"/>'
+    o += (f'<rect x="{tx + 100}" y="{my}" width="300" height="12" rx="6" fill="url(#bar)">'
+          f'<animate attributeName="width" values="0;300;300" keyTimes="0;.35;1" dur="{T}s" repeatCount="indefinite"/></rect>')
+    o += f'<text x="{tx + 414}" y="{my + 11}" {MONO} font-size="13" font-weight="700" fill="{OR}">100%</text>'
+    # mascote
+    mx = fx + fw - 210
+    o += (f'<g transform="translate({mx},{fy + 66})">{bob(clawd(10), 9)}'
+          f'<ellipse cx="70" cy="96" rx="58" ry="5" fill="#000" opacity=".35">'
+          f'<animate attributeName="rx" values="58;46;58" dur=".9s" repeatCount="indefinite"/></ellipse></g>')
+    for k, (dx, dy, fs) in enumerate(((-26, 40, 18), (166, 30, 14), (150, 140, 12), (-10, 150, 13))):
+        o += (f'<text x="{mx + dx}" y="{fy + dy}" {MONO} font-size="{fs}" fill="{OR}">✻'
+              f'<animate attributeName="opacity" values="0;1;0" dur="2.2s" begin="{-k*.55:.2f}s" repeatCount="indefinite"/></text>')
+
+    # ---------- demais ferramentas ----------
+    ly = fy + fh + 44
+    o += f'<text x="{fx}" y="{ly}" {MONO} font-size="14" fill="{DIM}">└ outras ferramentas</text>'
+    top = ly + 22
     rows = math.ceil(len(STACK) / cols)
-    x0 = (W - (cols * cw + (cols - 1) * gx)) / 2
-    top = 92
-    H = top + rows * (ch + gy) + 26
-    o = frame(W, H) + window_chrome(W, "/stack")
-    T = len(STACK) * .35 + 1.5
+    T2 = len(STACK) * .35 + 1.5
     for i, (name, col) in enumerate(STACK):
-        x = x0 + (i % cols) * (cw + gx)
-        y = top + (i // cols) * (ch + gy)
-        a = i * .35 / T
-        icon = (f'<g transform="translate(26,{ch/2})">{spark(0, 0, .17, 10, 12)}</g>' if name == "Claude Code"
-                else f'<circle cx="26" cy="{ch/2}" r="6" fill="{col}"/>')
+        r, c = divmod(i, cols)
+        in_row = min(cols, len(STACK) - r * cols)
+        x0 = (W - (in_row * cw + (in_row - 1) * gx)) / 2
+        x = x0 + c * (cw + gx)
+        y = top + r * (ch + gy)
+        a = i * .35 / T2
         chip = (f'<rect width="{cw}" height="{ch}" rx="14" fill="{PANEL}" stroke="{BORDER}" stroke-width="1.5">'
-                f'<animate attributeName="stroke" dur="{T:.1f}s" repeatCount="indefinite" '
+                f'<animate attributeName="stroke" dur="{T2:.1f}s" repeatCount="indefinite" '
                 f'keyTimes="0;{a:.3f};{a+.04:.3f};{a+.12:.3f};1" values="{BORDER};{BORDER};{OR};{BORDER};{BORDER}"/></rect>'
-                f'{icon}<text x="44" y="{ch/2+6}" {MONO} font-size="16" font-weight="600" fill="{CREAM}">{esc(name)}</text>')
+                f'<circle cx="26" cy="{ch/2}" r="6" fill="{col}"/>'
+                f'<text x="44" y="{ch/2+6}" {MONO} font-size="16" font-weight="600" fill="{CREAM}">{esc(name)}</text>')
         o += f'<g transform="translate({x:.0f},{y})">{bob(chip, 4, 2 + (i % 4) * .4)}</g>'
-    save("stack.svg", svg(W, H, o, border_gradient("bd", 12)))
+    H = top + rows * (ch + gy) + 20
+    o = frame(W, H) + stars(W, H, 18) + o
+    defs = (border_gradient("bd", 12) + border_gradient("bd2", 5) + GLOW
+            + '<filter id="soft" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>'
+            + f'<radialGradient id="rg" cx=".12" cy=".5" r=".6"><stop offset="0" stop-color="{OR}" stop-opacity=".22"/>'
+              f'<stop offset="1" stop-color="{OR}" stop-opacity="0"/></radialGradient>'
+            + f'<linearGradient id="bar" x1="0" x2="1"><stop offset="0" stop-color="{OR_D}"/><stop offset="1" stop-color="{MANILLA}"/></linearGradient>')
+    save("stack.svg", svg(W, H, o, defs))
 
 
 # ======================================================= 5. projetos
