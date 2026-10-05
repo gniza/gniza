@@ -226,6 +226,7 @@ TITULOS = {
     "stack": "Ferramentas",
     "projetos": "Projetos em destaque",
     "contrib": "Contribuições",
+    "nizashop": "Minha loja",
     "contato": "Vamos conversar?",
 }
 
@@ -251,6 +252,7 @@ CLAUDE_MD = [
     ("quote", "> Desenvolvedor web que transforma ideias em sites rápidos e bonitos."),
     ("blank", ""),
     ("h2", "## Sobre"),
+    ("li", "Fundador e CEO da NizaShop, loja na Shopee"),
     ("li", "Foco em front-end e experiência mobile"),
     ("li", "Crio sites e cardápios online para negócios locais"),
     ("li", "Aprendendo: Next.js, Supabase e animações em SVG"),
@@ -544,6 +546,204 @@ def footer():
     save("footer.svg", svg(W, H, o, defs))
 
 
+# ======================================================= 8. NizaShop
+NIZA_DIR = OUT.parent / "nizashop" / "assets"
+AMEIXA, PITAYA, PESSEGO, LAVANDA, LILAS, NOITE = "#2B1646", "#E11D6A", "#FFC7AE", "#EFE9F8", "#B8A4E3", "#1B1128"
+SANS = "font-family=\"Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif\""
+SHOPEE = "#ee4d2d"
+# CONTEÚDO
+NIZA_TAGLINE = "sua loja na Shopee"
+NIZA_CEO = "Fundador & CEO · Gabriel Niza"
+NIZA_PILARES = [
+    ("estrela", "Curadoria", "produtos escolhidos a dedo"),
+    ("etiqueta", "Preço justo", "ofertas e cupons toda semana"),
+    ("raio", "Envio rápido", "pedido separado no mesmo dia"),
+    ("coracao", "Feito com carinho", "embalagem caprichada"),
+]
+NIZA_PALETA = [("Ameixa", AMEIXA), ("Pitaya", PITAYA), ("Pêssego", PESSEGO), ("Lavanda", LAVANDA), ("Lilás", LILAS), ("Noite", NOITE)]
+
+
+def b64(path):
+    import base64
+    return "data:image/jpeg;base64," + base64.b64encode(Path(path).read_bytes()).decode()
+
+
+def niza_parts():
+    src = (NIZA_DIR / "logos" / "NizaShop-02-sobre-ameixa.svg").read_text()
+    n_path = re.search(r'<path d="(M18 46[^"]+)"', src).group(1)
+    words = re.findall(r'<path transform="(translate\([^)]+\))" d="([^"]+)"', src)
+    return n_path, words  # words: [(transform, d) "Niza", (transform, d) "shop"]
+
+
+def niza_logo(intro=1.0, light=True):
+    """Logo completo (viewBox 643x198) com animação de entrada e detalhes em loop."""
+    n_path, words = niza_parts()
+    box, ink = (LAVANDA, AMEIXA) if light else (AMEIXA, "#ffffff")
+    t = intro
+    sym = (f'<rect width="64" height="64" rx="18" fill="{box}"/>'
+           f'<path d="{n_path}" pathLength="1" fill="{ink}" stroke="{ink}" stroke-width="2" stroke-linejoin="round" '
+           f'stroke-dasharray="1" stroke-dashoffset="0">'
+           f'<animate attributeName="stroke-dashoffset" values="1;1;0" keyTimes="0;{t/(t+1):.3f};1" dur="{t+1:.2f}s" fill="freeze"/>'
+           f'<animate attributeName="fill-opacity" values="0;0;1" keyTimes="0;{(t+.8)/(t+1.3):.3f};1" dur="{t+1.3:.2f}s" fill="freeze"/></path>'
+           f'<g transform="translate(42.5,17)"><g>'
+           f'<animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 -5;0 0;0 -2;0 0" '
+           f'keyTimes="0;.6;.72;.84;.92;1" dur="2.6s" begin="{t+1.2:.1f}s" repeatCount="indefinite"/>'
+           f'<circle r="4.2" fill="{PITAYA}"/><circle r="4.2" fill="none" stroke="{PITAYA}" stroke-width="1.2">'
+           f'<animate attributeName="r" values="4.2;9" dur="2.6s" begin="{t+1.2:.1f}s" repeatCount="indefinite"/>'
+           f'<animate attributeName="opacity" values=".8;0" dur="2.6s" begin="{t+1.2:.1f}s" repeatCount="indefinite"/></circle></g></g>')
+    o = (f'<g transform="translate(99,99)"><g>'
+         f'<animateTransform attributeName="transform" type="scale" values="0;0;1.12;1" keyTimes="0;{t*.4/(t+.6):.3f};{(t*.4+.45)/(t+.6):.3f};1" dur="{t+.6:.2f}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.3 0 .4 1;.4 0 .6 1"/>'
+         f'<g transform="translate(-75,-75) scale(2.34375)">{sym}</g></g></g>')
+    for i, (tr, d) in enumerate(words):
+        st = t + .25 + i * .3
+        o += (f'<g opacity="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;{st/(st+.5):.3f};1" dur="{st+.5:.2f}s" fill="freeze"/>'
+              f'<animateTransform attributeName="transform" type="translate" values="-24 0;-24 0;0 0" keyTimes="0;{st/(st+.5):.3f};1" dur="{st+.5:.2f}s" fill="freeze" calcMode="spline" keySplines="0 0 1 1;.2 0 .2 1"/>'
+              f'<path transform="{tr}" fill="#ffffff" d="{d}"/>'
+              f'<path transform="{tr}" fill="url(#shine)" d="{d}"/></g>')
+    return o
+
+
+SHINE = ('<linearGradient id="shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">'
+         '<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#f6c9ff" stop-opacity=".9"/>'
+         '<stop offset="1" stop-color="#fff" stop-opacity="0"/>'
+         '<animateTransform attributeName="gradientTransform" type="translate" values="-200 0;-200 0;700 0" keyTimes="0;.55;1" dur="4.5s" repeatCount="indefinite"/></linearGradient>')
+
+
+def niza_glows(w, h, n=3):
+    cols = [LILAS, PITAYA, PESSEGO]
+    o = ""
+    for i in range(n):
+        cx, cy = w * (.2 + .3 * i), h * (.3 + .25 * (i % 2))
+        o += (f'<ellipse cx="{cx:.0f}" cy="{cy:.0f}" rx="{w*.22:.0f}" ry="{h*.35:.0f}" fill="{cols[i % 3]}" opacity=".22" filter="url(#nblur)">'
+              f'<animate attributeName="cx" values="{cx:.0f};{cx + w*.12:.0f};{cx:.0f}" dur="{12 + i*3}s" repeatCount="indefinite"/>'
+              f'<animate attributeName="cy" values="{cy:.0f};{cy + h*.15:.0f};{cy:.0f}" dur="{9 + i*2}s" repeatCount="indefinite"/></ellipse>')
+    return o
+
+
+def sparkles(w, h, n):
+    o = ""
+    for _ in range(n):
+        x, y, r = random.randint(20, w - 20), random.randint(20, h - 20), random.uniform(3, 7)
+        d = f"M0 {-r} Q0 0 {r} 0 Q0 0 0 {r} Q0 0 {-r} 0 Q0 0 0 {-r}Z"
+        o += (f'<path transform="translate({x},{y})" d="{d}" fill="#fff" opacity="0">'
+              f'<animate attributeName="opacity" values="0;.9;0" dur="{random.uniform(2, 4):.1f}s" '
+              f'begin="{-random.uniform(0, 4):.1f}s" repeatCount="indefinite"/></path>')
+    return o
+
+
+def light_sweep(w, h, dur=6):
+    return (f'<rect x="-300" y="-50" width="160" height="{h+100}" fill="url(#beam)" transform="skewX(-20)">'
+            f'<animate attributeName="x" values="-300;-300;{w+300}" keyTimes="0;.5;1" dur="{dur}s" repeatCount="indefinite"/></rect>')
+
+
+BEAM = ('<linearGradient id="beam" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/>'
+        '<stop offset=".5" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
+NBLUR = '<filter id="nblur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="40"/></filter>'
+
+
+def shopee_icon(size=50):
+    k = size / 50
+    return (f'<g transform="scale({k:.3f})"><rect x="-25" y="-25" width="50" height="50" rx="13" fill="{SHOPEE}"/>'
+            f'<path transform="scale(1.4) translate(-12,-12)" fill="#fff" d="{logo_path("shopee")}"/></g>')
+
+
+def nizashop_hero():
+    W, H = 1200, 420
+    o = (f'<clipPath id="cl"><rect width="{W}" height="{H}" rx="26"/></clipPath><g clip-path="url(#cl)">'
+         f'<image href="{b64(NIZA_DIR / "fundos" / "faixa-hero.jpg")}" width="{W}" height="{H}" preserveAspectRatio="xMidYMid slice"/>'
+         f'{niza_glows(W, H)}{sparkles(W, H, 26)}{light_sweep(W, H)}</g>')
+    o += f'<g transform="translate(290,52) scale(.96)">{niza_logo(.6)}</g>'
+    o += (f'<g transform="translate(600,300)"><g opacity="1">{reveal(2.2, .6)}'
+          f'<g transform="translate(-142,0)">{bob(shopee_icon(40), 3, 1.8)}</g>'
+          f'<text x="-112" y="10" {SANS} font-size="28" font-weight="600" fill="#fff">{esc(NIZA_TAGLINE)}</text></g></g>')
+    o += (f'<g opacity="1">{reveal(2.6, .6)}<rect x="{W/2-190}" y="338" width="380" height="44" rx="22" fill="{LILAS}"/>'
+          f'<text x="{W/2}" y="367" text-anchor="middle" {SANS} font-size="18" font-weight="700" fill="{AMEIXA}">{esc(NIZA_CEO)}</text></g>')
+    o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="26" fill="none" stroke="url(#nb)" stroke-width="2"/>'
+    defs = SHINE + BEAM + NBLUR + niza_border()
+    (NIZA_DIR / "hero.svg").write_text(svg(W, H, o, defs), encoding="utf-8")
+
+
+def niza_border(gid="nb"):
+    return (f'<linearGradient id="{gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{PITAYA}"/>'
+            f'<stop offset=".5" stop-color="{LILAS}"/><stop offset="1" stop-color="{PESSEGO}"/>'
+            f'<animateTransform attributeName="gradientTransform" type="rotate" from="0 .5 .5" to="360 .5 .5" dur="7s" repeatCount="indefinite"/></linearGradient>')
+
+
+def niza_icon(kind, c):
+    if kind == "estrela":
+        pts = " ".join(f"{math.cos(math.pi/2 + k*math.pi/5)*(18 if k % 2 == 0 else 8):.1f},{-math.sin(math.pi/2 + k*math.pi/5)*(18 if k % 2 == 0 else 8):.1f}" for k in range(10))
+        return f'<polygon points="{pts}" fill="{c}"/>'
+    if kind == "etiqueta":
+        return (f'<path d="M-16 -4 L-4 -16 H14 V2 L2 14 Z" fill="{c}" transform="rotate(0)"/>'
+                f'<circle cx="7" cy="-9" r="3" fill="{AMEIXA}"/>')
+    if kind == "raio":
+        return f'<polygon points="4,-18 -12,3 -1,3 -5,18 12,-4 1,-4" fill="{c}"/>'
+    return f'<path d="M0 14 C-22 0 -14 -18 0 -8 C14 -18 22 0 0 14Z" fill="{c}"/>'
+
+
+def nizashop_pilares():
+    W, cw, ch, g = 1200, 270, 190, 20
+    H = ch + 40
+    x0 = (W - (4 * cw + 3 * g)) / 2
+    o = ""
+    for i, (ic, t, sub) in enumerate(NIZA_PILARES):
+        x = x0 + i * (cw + g)
+        a = i * .25
+        card = (f'<rect width="{cw}" height="{ch}" rx="22" fill="{AMEIXA}"/>'
+                f'<rect width="{cw}" height="{ch}" rx="22" fill="url(#pg{i})"/>'
+                f'<rect width="{cw}" height="{ch}" rx="22" fill="none" stroke="{LILAS}" stroke-opacity=".35"/>'
+                f'<g transform="translate(52,58)"><circle r="30" fill="{LAVANDA}" opacity=".1"/>'
+                f'<g><animateTransform attributeName="transform" type="scale" values="1;1.15;1" dur="2s" begin="{-a:.2f}s" repeatCount="indefinite"/>'
+                f'{niza_icon(ic, PITAYA if i % 2 == 0 else PESSEGO)}</g></g>'
+                f'<text x="26" y="128" {SANS} font-size="24" font-weight="800" fill="#fff">{esc(t)}</text>'
+                f'<text x="26" y="158" {SANS} font-size="15" fill="{LILAS}">{esc(sub)}</text>')
+        o += f'<g transform="translate({x:.0f},20)">{bob(card, 5, 2.4 + i * .3)}</g>'
+    defs = "".join(f'<radialGradient id="pg{i}" cx=".2" cy=".2" r=".9"><stop offset="0" stop-color="{c}" stop-opacity=".35"/>'
+                   f'<stop offset="1" stop-color="{c}" stop-opacity="0"/></radialGradient>'
+                   for i, c in enumerate([LILAS, PITAYA, LILAS, PESSEGO]))
+    (NIZA_DIR / "pilares.svg").write_text(svg(W, H, o, defs), encoding="utf-8")
+
+
+def nizashop_paleta():
+    W, n, g = 1200, len(NIZA_PALETA), 16
+    cw = (W - 40 - (n - 1) * g) / n
+    H = 190
+    o = ""
+    for i, (nome, c) in enumerate(NIZA_PALETA):
+        x = 20 + i * (cw + g)
+        dark = c in (AMEIXA, NOITE, PITAYA)
+        tc = "#fff" if dark else AMEIXA
+        o += (f'<g transform="translate({x:.0f},20)"><g opacity="1">{reveal(.2 + i * .15, .4)}'
+              f'<rect width="{cw:.0f}" height="150" rx="20" fill="{c}" stroke="{LILAS}" stroke-opacity=".4">'
+              f'<animate attributeName="height" values="150;150;140;150" keyTimes="0;.7;.85;1" dur="4s" begin="{i*.3:.1f}s" repeatCount="indefinite"/></rect>'
+              f'<text x="18" y="104" {SANS} font-size="20" font-weight="800" fill="{tc}">{esc(nome)}</text>'
+              f'<text x="18" y="130" {MONO} font-size="14" fill="{tc}" opacity=".8">{c}</text></g></g>')
+    (NIZA_DIR / "paleta.svg").write_text(svg(W, H, o), encoding="utf-8")
+
+
+def nizashop_card():
+    """Card de destaque no perfil (assets/nizashop-card.svg)."""
+    W, H = 1200, 300
+    o = (f'<clipPath id="cl"><rect width="{W}" height="{H}" rx="22"/></clipPath><g clip-path="url(#cl)">'
+         f'<image href="{b64(NIZA_DIR / "fundos" / "faixa-card.jpg")}" width="{W}" height="{H}" preserveAspectRatio="xMidYMid slice"/>'
+         f'{niza_glows(W, H)}{sparkles(W, H, 18)}{light_sweep(W, H, 7)}</g>')
+    o += f'<g transform="translate(44,36) scale(.62)">{niza_logo(.4)}</g>'
+    o += (f'<rect x="64" y="196" width="232" height="40" rx="20" fill="{PITAYA}"/>'
+          f'<text x="180" y="222" text-anchor="middle" {SANS} font-size="17" font-weight="800" fill="#fff" letter-spacing=".5">FUNDADOR &amp; CEO</text>')
+    o += (f'<g transform="translate(336,216)">{shopee_icon(34)}</g>'
+          f'<text x="364" y="223" {SANS} font-size="20" font-weight="600" fill="#fff">{esc(NIZA_TAGLINE)}</text>')
+    btn = (f'<rect width="196" height="46" rx="23" fill="{LILAS}"/>'
+           f'<text x="98" y="29" text-anchor="middle" {SANS} font-size="18" font-weight="800" fill="{AMEIXA}">conhecer a loja →</text>')
+    o += f'<g transform="translate({W-250},196)">{bob(btn, 3, 1.6)}</g>'
+    o += f'<g transform="translate({W-152},96)">{bob(shopee_icon(64), 8, 1.4)}</g>'
+    o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="22" fill="none" stroke="url(#nb)" stroke-width="2.5"/>'
+    save("nizashop-card.svg", svg(W, H, o, SHINE + BEAM + NBLUR + niza_border()))
+
+
+def nizashop():
+    nizashop_hero(); nizashop_pilares(); nizashop_paleta(); nizashop_card()
+
+
 if __name__ == "__main__":
-    hero(); titles(); claude_md(); stack(); projects(); walk(); footer()
+    hero(); titles(); claude_md(); stack(); projects(); walk(); footer(); nizashop()
     print("SVGs gerados em", OUT)
