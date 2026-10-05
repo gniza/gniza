@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/hero.svg" alt="NizaShop. Fundador e CEO: Gabriel Niza" width="100%">
+<img src="assets/abertura.svg" alt="NizaShop. Fundador e CEO: Gabriel Niza" width="100%">
 
 <br><br>
 

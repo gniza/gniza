@@ -656,7 +656,7 @@ def nizashop_hero():
           f'<text x="{W/2}" y="341" text-anchor="middle" {SANS} font-size="18" font-weight="700" fill="{AMEIXA}">{esc(NIZA_CEO)}</text></g>')
     o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="26" fill="none" stroke="url(#nb)" stroke-width="2"/>'
     defs = SHINE + BEAM + NBLUR + niza_border()
-    (NIZA_DIR / "hero.svg").write_text(svg(W, H, o, defs), encoding="utf-8")
+    (NIZA_DIR / "abertura.svg").write_text(svg(W, H, o, defs), encoding="utf-8")
 
 
 def niza_border(gid="nb"):
@@ -718,7 +718,7 @@ def nizashop_paleta():
 
 
 def nizashop_card():
-    """Card de destaque no perfil (assets/nizashop-card.svg)."""
+    """Card de destaque no perfil (assets/loja-nizashop.svg)."""
     W, H = 1200, 300
     o = (f'<clipPath id="cl"><rect width="{W}" height="{H}" rx="22"/></clipPath><g clip-path="url(#cl)">'
          f'<image href="{b64(NIZA_DIR / "fundos" / "faixa-card.jpg")}" width="{W}" height="{H}" preserveAspectRatio="xMidYMid slice"/>'
@@ -731,7 +731,7 @@ def nizashop_card():
     o += f'<g transform="translate({W-250},196)">{bob(btn, 3, 1.6)}</g>'
     o += f'<g transform="translate({W-152},96)">{bob(shopee_icon(64), 8, 1.4)}</g>'
     o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="22" fill="none" stroke="url(#nb)" stroke-width="2.5"/>'
-    save("nizashop-card.svg", svg(W, H, o, SHINE + BEAM + NBLUR + niza_border()))
+    save("loja-nizashop.svg", svg(W, H, o, SHINE + BEAM + NBLUR + niza_border()))
 
 
 def nizashop():
