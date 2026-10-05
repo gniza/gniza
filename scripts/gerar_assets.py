@@ -6,11 +6,13 @@ Edite os textos nas seções marcadas com "CONTEÚDO" e rode:
 """
 import html
 import math
+import re
 import random
 import textwrap
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent.parent / "assets"
+LOGOS = Path(__file__).resolve().parent / "logos"  # ícones oficiais (Simple Icons, CC0)
 OUT.mkdir(exist_ok=True)
 random.seed(11)
 
@@ -55,22 +57,20 @@ GLOW = ('<filter id="glow" x="-60%" y="-60%" width="220%" height="220%">'
         '<feMergeNode in="SourceGraphic"/></feMerge></filter>')
 
 
-def spark(cx, cy, scale=1.0, dur=24, width=9):
-    """Faísca de raios irregulares que gira e pulsa."""
-    lens = [62, 44, 58, 40, 66, 46, 56, 42, 60, 48, 64, 40]
-    rays = ""
-    for k, L in enumerate(lens):
-        a = 2 * math.pi * k / len(lens)
-        x1, y1 = math.cos(a) * 14, math.sin(a) * 14
-        x2, y2 = math.cos(a) * L, math.sin(a) * L
-        d = 2.4 + (k % 3) * .4
-        rays += (f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{OR}" '
-                 f'stroke-width="{width}" stroke-linecap="round">'
-                 f'<animate attributeName="x2" values="{x2:.1f};{x2*1.14:.1f};{x2:.1f}" dur="{d:.1f}s" begin="{-k*.2:.1f}s" repeatCount="indefinite"/>'
-                 f'<animate attributeName="y2" values="{y2:.1f};{y2*1.14:.1f};{y2:.1f}" dur="{d:.1f}s" begin="{-k*.2:.1f}s" repeatCount="indefinite"/></line>')
-    return (f'<g transform="translate({cx},{cy}) scale({scale})"><g>'
+def logo_path(name):
+    """Caminho (atributo d) de um logo oficial em scripts/logos/<name>.svg (viewBox 24x24)."""
+    return re.search(r'<path d="([^"]+)"', (LOGOS / f"{name}.svg").read_text()).group(1)
+
+
+def spark(cx, cy, scale=1.0, dur=24, width=None):
+    """Logo oficial da Claude girando devagar e 'respirando'."""
+    k = scale * 5.6
+    return (f'<g transform="translate({cx},{cy})"><g>'
             f'<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="{dur}s" repeatCount="indefinite"/>'
-            f'{rays}</g></g>')
+            f'<g><animateTransform attributeName="transform" type="scale" values="1;1.09;1" dur="2.6s" repeatCount="indefinite" '
+            f'calcMode="spline" keyTimes="0;.5;1" keySplines=".4 0 .6 1;.4 0 .6 1"/>'
+            f'<path transform="scale({k:.3f}) translate(-12,-12)" fill="{OR}" d="{logo_path("claude")}"/>'
+            f'</g></g></g>')
 
 
 def clawd(u, walk=False, wave=True):
@@ -157,7 +157,7 @@ def hero():
           f'{reveal(.2, .8)}</text>')
     o += f'<text x="72" y="240" {MONO} font-size="17" fill="{MUTED}">{esc(HERO_SUB)}</text>'
     o += f'<text x="72" y="274" {MONO} font-size="14" fill="{DIM}">/help para ajuda · /status para ver a configuração</text>'
-    o += f'<g filter="url(#glow)">{spark(1070, 160, .85)}</g>'
+    o += f'<g filter="url(#glow)">{spark(1062, 168, .72)}</g>'
     o += (f'<g transform="translate(860,170)">{bob(clawd(9), 8)}'
           f'<ellipse cx="63" cy="84" rx="52" ry="5" fill="#000" opacity=".35">'
           f'<animate attributeName="rx" values="52;42;52" dur=".9s" repeatCount="indefinite"/></ellipse></g>')
@@ -312,10 +312,10 @@ STACK = [
 PRINCIPAL = "Claude Code"
 PRINCIPAL_SUB = "meu parceiro de programação no terminal"
 PRINCIPAL_CMD = '> claude "cria o site e deixa bonito"'
-# ferramentas secundárias (nome, cor, ícone: "estrela" ou "anel")
+# ferramentas secundárias (nome, cor da borda, logo em scripts/logos/)
 SECUNDARIAS = [
-    ("Gemini", "#8e7cf0", "estrela"),
-    ("ChatGPT", "#10a37f", "anel"),
+    ("Gemini", "#8e7cf0", "googlegemini"),
+    ("ChatGPT", "#10a37f", "openai"),
 ]
 
 
@@ -378,14 +378,16 @@ def stack():
     sw = (fw - sg) / 2
     for i, (name, col, icon) in enumerate(SECUNDARIAS):
         x, y = fx + i * (sw + sg), ly + 20
-        if icon == "estrela":
-            pts = "0,-22 5,-5 22,0 5,5 0,22 -5,5 -22,0 -5,-5"
-            ic = (f'<polygon points="{pts}" fill="url(#gem)"><animateTransform attributeName="transform" type="rotate" '
-                  f'values="0;90;90" keyTimes="0;.3;1" dur="4s" repeatCount="indefinite"/></polygon>')
+        if icon == "googlegemini":
+            ic = (f'<g><animateTransform attributeName="transform" type="rotate" values="0;0;90;90" '
+                  f'keyTimes="0;.55;.8;1" dur="5s" repeatCount="indefinite" calcMode="spline" '
+                  f'keySplines="0 0 1 1;.5 0 .3 1;0 0 1 1"/>'
+                  f'<g><animateTransform attributeName="transform" type="scale" values="1;1.12;1" dur="2.5s" repeatCount="indefinite"/>'
+                  f'<path transform="scale(1.9) translate(-12,-12)" fill="url(#gem)" d="{logo_path(icon)}"/></g></g>')
         else:
-            ic = (f'<circle r="16" fill="none" stroke="{col}" stroke-width="5" stroke-dasharray="20 5.1">'
-                  f'<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite"/></circle>'
-                  f'<circle r="5" fill="{col}"/>')
+            ic = (f'<rect x="-25" y="-25" width="50" height="50" rx="13" fill="{col}"/>'
+                  f'<g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite"/>'
+                  f'<path transform="scale(1.45) translate(-12,-12)" fill="#ffffff" d="{logo_path(icon)}"/></g>')
         card = (f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{PANEL}" stroke="{col}" stroke-opacity=".55" stroke-width="1.5"/>'
                 f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{col}" opacity=".06"/>'
                 f'<g transform="translate(52,{sh/2})">{ic}</g>'
@@ -420,8 +422,10 @@ def stack():
             + '<filter id="soft" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>'
             + f'<radialGradient id="rg" cx=".12" cy=".5" r=".6"><stop offset="0" stop-color="{OR}" stop-opacity=".22"/>'
               f'<stop offset="1" stop-color="{OR}" stop-opacity="0"/></radialGradient>'
-            + '<linearGradient id="gem" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285f4"/>'
-              '<stop offset=".55" stop-color="#9b72cb"/><stop offset="1" stop-color="#d96570"/></linearGradient>'
+            + '<linearGradient id="gem" gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21">'
+              '<stop offset="0" stop-color="#439ddf"/><stop offset=".3" stop-color="#4f87ed"/>'
+              '<stop offset=".6" stop-color="#9476c5"/><stop offset=".85" stop-color="#bc688e"/>'
+              '<stop offset="1" stop-color="#d6645d"/></linearGradient>'
             + f'<linearGradient id="bar" x1="0" x2="1"><stop offset="0" stop-color="{OR_D}"/><stop offset="1" stop-color="{MANILLA}"/></linearGradient>')
     save("stack.svg", svg(W, H, o, defs))
 
