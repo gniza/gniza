@@ -312,11 +312,69 @@ STACK = [
 PRINCIPAL = "Claude Code"
 PRINCIPAL_SUB = "meu parceiro de programação no terminal"
 PRINCIPAL_CMD = '> claude "cria o site e deixa bonito"'
-# ferramentas secundárias (nome, cor da borda, logo em scripts/logos/)
+# cards médios: (nome, subtítulo, cor, logo em scripts/logos/, selo, cor do selo)
 SECUNDARIAS = [
-    ("Gemini", "#8e7cf0", "googlegemini"),
-    ("ChatGPT", "#10a37f", "openai"),
+    ("Gemini", "assistente de IA", "#8e7cf0", "googlegemini", "SECUNDÁRIA", MUTED),
+    ("ChatGPT", "assistente de IA", "#10a37f", "openai", "SECUNDÁRIA", MUTED),
 ]
+DESIGN_MARKETING = [
+    ("TryBloom", "design de marca com IA", "#9d4edd", "trybloom", "DESIGN", "#c08cf0"),
+    ("Shopee", "especialista em tráfego", "#ee4d2d", "shopee", "ESPECIALIDADE", "#ff7a5c"),
+]
+
+
+def tool_icon(icon, col):
+    """Logo oficial animado, centrado em (0,0), ~50px."""
+    if icon == "googlegemini":
+        return (f'<g><animateTransform attributeName="transform" type="rotate" values="0;0;90;90" '
+                f'keyTimes="0;.55;.8;1" dur="5s" repeatCount="indefinite" calcMode="spline" '
+                f'keySplines="0 0 1 1;.5 0 .3 1;0 0 1 1"/>'
+                f'<g><animateTransform attributeName="transform" type="scale" values="1;1.12;1" dur="2.5s" repeatCount="indefinite"/>'
+                f'<path transform="scale(1.9) translate(-12,-12)" fill="url(#gem)" d="{logo_path(icon)}"/></g></g>')
+    if icon == "openai":
+        return (f'<rect x="-25" y="-25" width="50" height="50" rx="13" fill="{col}"/>'
+                f'<g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite"/>'
+                f'<path transform="scale(1.45) translate(-12,-12)" fill="#ffffff" d="{logo_path(icon)}"/></g>')
+    if icon == "trybloom":
+        # ícone oficial (360x360): fundo branco, contorno da flor e miolo roxos
+        src = (LOGOS / "trybloom.svg").read_text()
+        rect = re.search(r"<rect[^>]*/>", src).group(0)
+        outer, inner = re.findall(r'<path d="([^"]+)" fill="(#[0-9A-Fa-f]+)"', src)[:2]
+        return (f'<g transform="translate(-25,-25) scale({50/360:.4f})">{rect}'
+                f'<g><animateTransform attributeName="transform" type="rotate" from="0 180 180" to="360 180 180" dur="14s" repeatCount="indefinite"/>'
+                f'<path d="{outer[0]}" fill="{outer[1]}"/></g>'
+                f'<g transform="translate(180,180)"><g><animateTransform attributeName="transform" type="scale" values="1;1.1;1" '
+                f'dur="2.4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".4 0 .6 1;.4 0 .6 1"/>'
+                f'<path transform="translate(-180,-180)" d="{inner[0]}" fill="{inner[1]}"/></g></g></g>')
+    if icon == "shopee":
+        # sacola oficial em branco sobre o laranja da marca, dando pulinhos
+        return (f'<rect x="-25" y="-25" width="50" height="50" rx="13" fill="{col}"/>'
+                f'<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -4;0 0;0 0" '
+                f'keyTimes="0;.2;.4;1" dur="1.8s" repeatCount="indefinite"/>'
+                f'<path transform="scale(1.4) translate(-12,-12)" fill="#ffffff" d="{logo_path(icon)}"/></g>')
+    raise ValueError(icon)
+
+
+def tool_card(sw, sh, name, sub, col, icon, badge, badge_col):
+    o = (f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{PANEL}" stroke="{col}" stroke-opacity=".55" stroke-width="1.5"/>'
+         f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{col}" opacity=".06"/>')
+    if icon == "shopee":
+        # gráfico de tráfego subindo ao fundo
+        pts = [(290, 86), (320, 78), (345, 82), (372, 64), (398, 68), (425, 46), (450, 52), (480, 28), (sw - 16, 14)]
+        line = " ".join(f"{x:.0f},{y}" for x, y in pts)
+        area = f"M290 {sh-6} L" + " L".join(f"{x:.0f} {y}" for x, y in pts) + f" L{sw-16:.0f} {sh-6} Z"
+        o += (f'<path d="{area}" fill="{col}" opacity=".10"/>'
+              f'<polyline points="{line}" fill="none" stroke="{col}" stroke-width="2.5" stroke-linejoin="round" '
+              f'stroke-linecap="round" opacity=".55" stroke-dasharray="360" stroke-dashoffset="360">'
+              f'<animate attributeName="stroke-dashoffset" values="360;0;0;360" keyTimes="0;.45;.85;1" dur="5s" repeatCount="indefinite"/></polyline>')
+    bw = len(badge) * 8.4 + 30
+    o += (f'<g transform="translate(52,{sh/2})">{tool_icon(icon, col)}</g>'
+          f'<text x="96" y="{sh/2 - 4}" {SERIF} font-size="30" fill="{CREAM}">{esc(name)}</text>'
+          f'<text x="98" y="{sh/2 + 22}" {MONO} font-size="14" fill="{MUTED}">{esc(sub)}</text>'
+          f'<rect x="{sw - bw - 26:.0f}" y="{sh/2 - 14}" width="{bw:.0f}" height="28" rx="14" fill="{PANEL}" stroke="{badge_col}" stroke-opacity=".7"/>'
+          f'<text x="{sw - bw/2 - 26:.0f}" y="{sh/2 + 5}" text-anchor="middle" {MONO} font-size="12" font-weight="700" '
+          f'fill="{badge_col}" letter-spacing="1.2">{esc(badge)}</text>')
+    return o
 
 
 def stack():
@@ -371,34 +429,18 @@ def stack():
         o += (f'<text x="{mx + dx}" y="{fy + dy}" {MONO} font-size="{fs}" fill="{OR}">✻'
               f'<animate attributeName="opacity" values="0;1;0" dur="2.2s" begin="{-k*.55:.2f}s" repeatCount="indefinite"/></text>')
 
-    # ---------- secundárias ----------
-    ly = fy + fh + 44
-    o += f'<text x="{fx}" y="{ly}" {MONO} font-size="14" fill="{DIM}">└ ferramentas secundárias</text>'
+    # ---------- secundárias e design & marketing ----------
     sh, sg = 96, 20
     sw = (fw - sg) / 2
-    for i, (name, col, icon) in enumerate(SECUNDARIAS):
-        x, y = fx + i * (sw + sg), ly + 20
-        if icon == "googlegemini":
-            ic = (f'<g><animateTransform attributeName="transform" type="rotate" values="0;0;90;90" '
-                  f'keyTimes="0;.55;.8;1" dur="5s" repeatCount="indefinite" calcMode="spline" '
-                  f'keySplines="0 0 1 1;.5 0 .3 1;0 0 1 1"/>'
-                  f'<g><animateTransform attributeName="transform" type="scale" values="1;1.12;1" dur="2.5s" repeatCount="indefinite"/>'
-                  f'<path transform="scale(1.9) translate(-12,-12)" fill="url(#gem)" d="{logo_path(icon)}"/></g></g>')
-        else:
-            ic = (f'<rect x="-25" y="-25" width="50" height="50" rx="13" fill="{col}"/>'
-                  f'<g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite"/>'
-                  f'<path transform="scale(1.45) translate(-12,-12)" fill="#ffffff" d="{logo_path(icon)}"/></g>')
-        card = (f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{PANEL}" stroke="{col}" stroke-opacity=".55" stroke-width="1.5"/>'
-                f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{col}" opacity=".06"/>'
-                f'<g transform="translate(52,{sh/2})">{ic}</g>'
-                f'<text x="96" y="{sh/2 - 4}" {SERIF} font-size="30" fill="{CREAM}">{esc(name)}</text>'
-                f'<text x="98" y="{sh/2 + 22}" {MONO} font-size="14" fill="{MUTED}">assistente de IA</text>'
-                f'<rect x="{sw - 148:.0f}" y="{sh/2 - 14}" width="122" height="28" rx="14" fill="none" stroke="{MUTED}" stroke-opacity=".6"/>'
-                f'<text x="{sw - 87:.0f}" y="{sh/2 + 5}" text-anchor="middle" {MONO} font-size="12" font-weight="700" fill="{MUTED}" letter-spacing="1.2">SECUNDÁRIA</text>')
-        o += f'<g transform="translate({x:.0f},{y})">{bob(card, 3, 2.6 + i * .5)}</g>'
+    ly = fy + fh + 44
+    for label, cards in (("└ ferramentas secundárias", SECUNDARIAS), ("└ design & marketing", DESIGN_MARKETING)):
+        o += f'<text x="{fx}" y="{ly}" {MONO} font-size="14" fill="{DIM}">{esc(label)}</text>'
+        for i, card_data in enumerate(cards):
+            x, y = fx + i * (sw + sg), ly + 20
+            o += f'<g transform="translate({x:.0f},{y})">{bob(tool_card(sw, sh, *card_data), 3, 2.6 + i * .5)}</g>'
+        ly += 20 + sh + 44
 
     # ---------- demais ferramentas ----------
-    ly = ly + 20 + sh + 44
     o += f'<text x="{fx}" y="{ly}" {MONO} font-size="14" fill="{DIM}">└ outras ferramentas</text>'
     top = ly + 22
     rows = math.ceil(len(STACK) / cols)
