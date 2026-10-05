@@ -64,6 +64,20 @@ const gabriel = {
 <img src="assets/divider.svg" alt="" width="100%">
 </div>
 
+## 🤖 Feito com Claude Code
+
+<div align="center">
+<img src="assets/claude-code.svg" alt="Terminal do Claude Code com o mascote e o logo" width="100%">
+<br>
+<img src="assets/clawd-walk.svg" alt="Mascote do Claude Code caminhando" width="100%">
+<br>
+<sub>Este perfil foi construído em parceria com o <a href="https://claude.com/claude-code">Claude Code</a> ✻</sub>
+</div>
+
+<div align="center">
+<img src="assets/divider.svg" alt="" width="100%">
+</div>
+
 ## 🐍 Minhas contribuições
 
 <div align="center">
