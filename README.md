@@ -28,7 +28,13 @@
 <img src="assets/titulo-nizashop.svg" alt="Minha loja" width="100%">
 
 <div align="center">
-<a href="nizashop/"><img src="assets/loja-nizashop.svg" alt="NizaShop, loja na Shopee. Gabriel Niza, fundador e CEO. Clique para conhecer a loja" width="100%"></a>
+<a href="nizashop/"><img src="assets/nizashop-destaque.svg" alt="NizaShop, loja na Shopee. Gabriel Niza, fundador e CEO. Loja criada com Claude, Gemini e TryBloom" width="100%"></a>
+<br><br>
+<a href="nizashop/"><img src="assets/nizashop-vitrine.svg" alt="Vitrine com os banners da NizaShop: boas-vindas, cupons, 10.10, 11.11, 12.12, Black Friday e Natal" width="100%"></a>
+<br><br>
+<a href="nizashop/"><img src="nizashop/assets/videos/campanha-11.11.webp" alt="Campanha 11.11 da NizaShop" width="32%"></a>
+<a href="nizashop/"><img src="nizashop/assets/videos/campanha-natal.webp" alt="Campanha de Natal da NizaShop" width="32%"></a>
+<a href="nizashop/"><img src="nizashop/assets/videos/campanha-ano-novo.webp" alt="Campanha de Ano Novo da NizaShop" width="32%"></a>
 </div>
 
 <img src="assets/titulo-projetos.svg" alt="Projetos em destaque" width="100%">

@@ -6,7 +6,9 @@
 
 <img src="https://img.shields.io/badge/loja_na-Shopee-ee4d2d?style=for-the-badge&logo=shopee&logoColor=white&labelColor=2b1646" alt="Loja na Shopee">
 <img src="https://img.shields.io/badge/CEO-Gabriel_Niza-e11d6a?style=for-the-badge&labelColor=2b1646" alt="CEO: Gabriel Niza">
-<img src="https://img.shields.io/badge/identidade_visual-TryBloom-b8a4e3?style=for-the-badge&labelColor=2b1646" alt="Identidade visual feita com TryBloom">
+<img src="https://img.shields.io/badge/criada_com-Claude-d97757?style=for-the-badge&logo=claude&logoColor=d97757&labelColor=2b1646" alt="Criada com Claude">
+<img src="https://img.shields.io/badge/criada_com-Gemini-8e7cf0?style=for-the-badge&logo=googlegemini&logoColor=8e7cf0&labelColor=2b1646" alt="Criada com Gemini">
+<img src="https://img.shields.io/badge/criada_com-TryBloom-b8a4e3?style=for-the-badge&labelColor=2b1646" alt="Criada com TryBloom">
 
 </div>
 
@@ -15,6 +17,8 @@
 A **NizaShop** é uma loja na **Shopee** feita para quem gosta de comprar bem: produtos escolhidos a dedo, preço justo, envio rápido e cada pedido embalado com carinho.
 
 Por trás da loja está **[Gabriel Niza](https://github.com/gniza)**, **fundador e CEO**, que cuida de tudo: da curadoria dos produtos ao tráfego com IA que leva a loja até quem procura por ela.
+
+A loja foi criada com a ajuda de três ferramentas de IA: **[Claude](https://claude.ai)**, **[Gemini](https://gemini.google.com)** e **[TryBloom](https://www.trybloom.ai)**.
 
 <div align="center">
 <img src="assets/pilares.svg" alt="Curadoria, preço justo, envio rápido e feito com carinho" width="100%">

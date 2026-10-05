@@ -717,12 +717,29 @@ def nizashop_paleta():
     (NIZA_DIR / "paleta.svg").write_text(svg(W, H, o), encoding="utf-8")
 
 
+# CONTEÚDO: ferramentas usadas para criar a loja (logo em scripts/logos/)
+NIZA_FEITA_COM = [("Claude", "claude"), ("Gemini", "googlegemini"), ("TryBloom", "trybloom")]
+GEM = ('<linearGradient id="gem" gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21">'
+       '<stop offset="0" stop-color="#439ddf"/><stop offset=".3" stop-color="#4f87ed"/>'
+       '<stop offset=".6" stop-color="#9476c5"/><stop offset=".85" stop-color="#bc688e"/>'
+       '<stop offset="1" stop-color="#d6645d"/></linearGradient>')
+
+
+def mini_logo(icon, size=32):
+    """Logo oficial pequeno e animado, centrado em (0,0)."""
+    if icon == "claude":
+        k = size / 24
+        return (f'<g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="12s" repeatCount="indefinite"/>'
+                f'<path transform="scale({k:.3f}) translate(-12,-12)" fill="{OR}" d="{logo_path("claude")}"/></g>')
+    return f'<g transform="scale({size/50:.3f})">{tool_icon(icon, "#fff")}</g>'
+
+
 def nizashop_card():
-    """Card de destaque no perfil (assets/loja-nizashop.svg)."""
-    W, H = 1200, 300
+    """Card de destaque no perfil (assets/nizashop-destaque.svg)."""
+    W, H = 1200, 370
     o = (f'<clipPath id="cl"><rect width="{W}" height="{H}" rx="22"/></clipPath><g clip-path="url(#cl)">'
          f'<image href="{b64(NIZA_DIR / "fundos" / "faixa-card.jpg")}" width="{W}" height="{H}" preserveAspectRatio="xMidYMid slice"/>'
-         f'{niza_glows(W, H)}{sparkles(W, H, 18)}{light_sweep(W, H, 7)}</g>')
+         f'{niza_glows(W, H)}{sparkles(W, H, 20)}{light_sweep(W, H, 7)}</g>')
     o += f'<g transform="translate(44,36) scale(.62)">{niza_logo(.4)}</g>'
     o += (f'<rect x="64" y="196" width="232" height="40" rx="20" fill="{PITAYA}"/>'
           f'<text x="180" y="222" text-anchor="middle" {SANS} font-size="17" font-weight="800" fill="#fff" letter-spacing=".5">FUNDADOR &amp; CEO</text>')
@@ -730,12 +747,51 @@ def nizashop_card():
            f'<text x="98" y="29" text-anchor="middle" {SANS} font-size="18" font-weight="800" fill="{AMEIXA}">conhecer a loja →</text>')
     o += f'<g transform="translate({W-250},196)">{bob(btn, 3, 1.6)}</g>'
     o += f'<g transform="translate({W-152},96)">{bob(shopee_icon(64), 8, 1.4)}</g>'
+    # faixa "feita com"
+    fy = 266
+    o += (f'<rect x="44" y="{fy}" width="{W-88}" height="72" rx="20" fill="{NOITE}" fill-opacity=".55" stroke="{LILAS}" stroke-opacity=".3"/>'
+          f'<text x="74" y="{fy+43}" {SANS} font-size="17" font-weight="600" fill="{LILAS}">loja criada com</text>')
+    x = 236
+    for i, (nome, icon) in enumerate(NIZA_FEITA_COM):
+        chip = (f'<rect x="-8" y="-24" width="{len(nome)*11.5 + 68:.0f}" height="48" rx="24" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".18"/>'
+                f'<g transform="translate(20,0)">{mini_logo(icon, 30)}</g>'
+                f'<text x="46" y="7" {SANS} font-size="19" font-weight="700" fill="#fff">{esc(nome)}</text>')
+        o += f'<g transform="translate({x},{fy+36})"><g opacity="1">{reveal(1.2 + i*.35, .5)}{chip}</g></g>'
+        x += len(nome) * 11.5 + 88
+    o += (f'<text x="{W-74}" y="{fy+43}" text-anchor="end" {SANS} font-size="16" fill="{LILAS}">'
+          f'+ tráfego com IA na Shopee</text>')
     o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="22" fill="none" stroke="url(#nb)" stroke-width="2.5"/>'
-    save("loja-nizashop.svg", svg(W, H, o, SHINE + BEAM + NBLUR + niza_border()))
+    save("nizashop-destaque.svg", svg(W, H, o, SHINE + BEAM + NBLUR + GEM + niza_border()))
+
+
+def nizashop_vitrine():
+    """Carrossel infinito com os banners da loja (assets/nizashop-vitrine.svg)."""
+    import base64, io
+    from PIL import Image
+    banners = sorted((NIZA_DIR / "banners").glob("*.jpg"))
+    W, H, bw, bh, g = 1200, 250, 400, 200, 20
+    defs = f'<clipPath id="rc"><rect width="{bw}" height="{bh}" rx="16"/></clipPath>'
+    for i, f in enumerate(banners):
+        buf = io.BytesIO()
+        Image.open(f).convert("RGB").resize((bw, bh), Image.LANCZOS).save(buf, "JPEG", quality=70, optimize=True, progressive=True)
+        href = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+        defs += (f'<g id="b{i}"><image href="{href}" width="{bw}" height="{bh}" clip-path="url(#rc)"/>'
+                 f'<rect width="{bw}" height="{bh}" rx="16" fill="none" stroke="{LILAS}" stroke-opacity=".35"/></g>')
+    period = len(banners) * (bw + g)
+    strip = "".join(f'<use href="#b{i % len(banners)}" x="{i*(bw+g)}" y="25"/>' for i in range(len(banners) * 2))
+    o = (f'<clipPath id="fr"><rect width="{W}" height="{H}" rx="22"/></clipPath><g clip-path="url(#fr)">'
+         f'<rect width="{W}" height="{H}" fill="{AMEIXA}"/>{niza_glows(W, H)}'
+         f'<g><animateTransform attributeName="transform" type="translate" from="0 0" to="-{period} 0" dur="{len(banners)*5}s" repeatCount="indefinite"/>{strip}</g>'
+         f'<rect width="140" height="{H}" fill="url(#fl)"/><rect x="{W-140}" width="140" height="{H}" fill="url(#frr)"/></g>'
+         f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="22" fill="none" stroke="url(#nb)" stroke-width="2.5"/>')
+    defs += (f'<linearGradient id="fl" x1="0" x2="1"><stop offset="0" stop-color="{AMEIXA}"/><stop offset="1" stop-color="{AMEIXA}" stop-opacity="0"/></linearGradient>'
+             f'<linearGradient id="frr" x1="0" x2="1"><stop offset="0" stop-color="{AMEIXA}" stop-opacity="0"/><stop offset="1" stop-color="{AMEIXA}"/></linearGradient>'
+             + NBLUR + niza_border())
+    save("nizashop-vitrine.svg", svg(W, H, o, defs))
 
 
 def nizashop():
-    nizashop_hero(); nizashop_pilares(); nizashop_paleta(); nizashop_card()
+    nizashop_hero(); nizashop_pilares(); nizashop_paleta(); nizashop_card(); nizashop_vitrine()
 
 
 if __name__ == "__main__":
