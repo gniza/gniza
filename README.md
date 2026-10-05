@@ -1,26 +1,85 @@
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://coolreadme.xyz/api/hero-banner?user=gniza&title=gniza&subtitle=Building%20things%20on%20the%20internet&theme=dark"><img alt="gniza hero" src="https://coolreadme.xyz/api/hero-banner?user=gniza&title=gniza&subtitle=Building%20things%20on%20the%20internet&theme=light"></picture>
+<div align="center">
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://coolreadme.xyz/api/typing-card?user=gniza&lines=Building%20things%20on%20the%20internet%7Cgithub.com%2Fgniza&theme=dark"><img alt="typing intro" src="https://coolreadme.xyz/api/typing-card?user=gniza&lines=Building%20things%20on%20the%20internet%7Cgithub.com%2Fgniza&theme=light"></picture>
+<img src="assets/header.svg" alt="Gabriel Niza — desenvolvedor web" width="100%">
 
-### Featured projects
+<img src="assets/typing.svg" alt="Transformo ideias em sites rápidos e bonitos" width="720">
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://coolreadme.xyz/api/projects-gallery?user=gniza&projects=gniza%7C%7C%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2Fgniza%3B%3BConquestSite%7C%7CCSS%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2FConquestSite%3B%3BAtakamaGastrobar%7C%7CCSS%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2FAtakamaGastrobar%3B%3BSitePontoPet%7C%7CCSS%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2FSitePontoPet%3B%3BCordel-Moderno-HTML-CSS%7C%7CHTML%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2FCordel-Moderno-HTML-CSS%3B%3Bhtmlcssniza%7CHTML%2Be%2BCSS%7CHTML%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2Fhtmlcssniza&theme=dark"><img alt="Featured projects" src="https://coolreadme.xyz/api/projects-gallery?user=gniza&projects=gniza%7C%7C%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2Fgniza%3B%3BConquestSite%7C%7CCSS%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2FConquestSite%3B%3BAtakamaGastrobar%7C%7CCSS%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2FAtakamaGastrobar%3B%3BSitePontoPet%7C%7CCSS%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2FSitePontoPet%3B%3BCordel-Moderno-HTML-CSS%7C%7CHTML%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2FCordel-Moderno-HTML-CSS%3B%3Bhtmlcssniza%7CHTML%2Be%2BCSS%7CHTML%7C0%7Chttps%3A%2F%2Fgithub.com%2Fgniza%2Fhtmlcssniza&theme=light"></picture>
+<br>
 
-### Stats
+<a href="https://github.com/gniza?tab=repositories"><img src="https://img.shields.io/badge/Rol%C3%A2ndia--PR-Brasil-58a6ff?style=for-the-badge&logo=googlemaps&logoColor=white&labelColor=161b22" alt="Rolândia-PR"></a>
+<img src="https://img.shields.io/badge/Dispon%C3%ADvel_para_projetos-bc8cff?style=for-the-badge&logo=checkmarx&logoColor=white&labelColor=161b22" alt="Disponível para projetos">
+<img src="https://img.shields.io/badge/Foco-Web_%26_Front--end-ff7bd5?style=for-the-badge&logo=html5&logoColor=white&labelColor=161b22" alt="Foco em Web e Front-end">
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://coolreadme.xyz/api/stats-card?user=gniza&theme=dark"><img alt="gniza GitHub stats" src="https://coolreadme.xyz/api/stats-card?user=gniza&theme=light"></picture>
+<img src="assets/divider.svg" alt="" width="100%">
 
-![fox streak](https://coolreadme.xyz/api/fox-card?user=gniza)
+</div>
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="https://coolreadme.xyz/api/wakatime-card?user=gniza&theme=dark"><img alt="gniza coding time" src="https://coolreadme.xyz/api/wakatime-card?user=gniza&theme=light"></picture>
+## 👋 Sobre mim
 
-### Currently
+```ts
+const gabriel = {
+  nome: "Gabriel Niza",
+  local: "Rolândia, Paraná 🇧🇷",
+  trabalho: "Crio sites e cardápios online para negócios locais",
+  especialidade: ["mobile-first", "pedidos pelo WhatsApp", "visual moderno"],
+  aprendendo: ["Next.js", "Supabase", "animações com CSS/SVG"],
+  objetivo: "colocar o comércio da minha cidade na internet 🚀",
+};
+```
 
-[![gniza netflix-style card](https://coolreadme.xyz/api/netflix-card?title=gniza&synopsis=A%20code%20project%20by%20%40gniza.&genre=Open%20Source&match=98&rating=PG&img=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F263664003%3Fv%3D4&user=gniza&style=poster)](https://github.com/gniza/gniza)
+<div align="center">
+<img src="assets/divider.svg" alt="" width="100%">
+</div>
 
-### Connect
+## 🛠️ Tecnologias
 
-![Connect with gniza](https://coolreadme.xyz/api/social-card?user=gniza&title=Let's%20talk&sub=DMs%20open&skills=css%2Chtml&style=instagram)
+<div align="center">
+<img src="assets/skills.svg" alt="HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Git, Vercel, Supabase, Figma">
+</div>
 
+<div align="center">
+<img src="assets/divider.svg" alt="" width="100%">
+</div>
 
-<sub>Built with [coolreadme.xyz](https://coolreadme.xyz/u/gniza) — one-click GitHub README cards.</sub>
+## 🚀 Projetos em destaque
+
+<div align="center">
+<table>
+  <tr>
+    <td><a href="https://github.com/gniza/agrovic-site"><img src="assets/card-agrovic-site.svg" alt="agrovic-site" width="400"></a></td>
+    <td><a href="https://github.com/gniza/costelao-pedidos"><img src="assets/card-costelao-pedidos.svg" alt="costelao-pedidos" width="400"></a></td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/gniza/studiohairhousebarber"><img src="assets/card-studiohairhousebarber.svg" alt="studiohairhousebarber" width="400"></a></td>
+    <td><a href="https://github.com/gniza/DomBoscoPage"><img src="assets/card-DomBoscoPage.svg" alt="DomBoscoPage" width="400"></a></td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/gniza/SitePontoPet"><img src="assets/card-SitePontoPet.svg" alt="SitePontoPet" width="400"></a></td>
+    <td><a href="https://github.com/gniza/AtakamaGastrobar"><img src="assets/card-AtakamaGastrobar.svg" alt="AtakamaGastrobar" width="400"></a></td>
+  </tr>
+</table>
+</div>
+
+<div align="center">
+<img src="assets/divider.svg" alt="" width="100%">
+</div>
+
+## 🐍 Minhas contribuições
+
+<div align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/gniza/gniza/output/github-snake-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/gniza/gniza/output/github-snake.svg">
+  <img alt="Cobrinha comendo as minhas contribuições" src="https://raw.githubusercontent.com/gniza/gniza/output/github-snake-dark.svg" width="100%">
+</picture>
+</div>
+
+<div align="center">
+
+## 💬 Vamos conversar?
+
+Precisa de um site para o seu negócio? Dá uma olhada nos projetos acima ou abre uma [issue](https://github.com/gniza/gniza/issues) por aqui.
+
+<img src="assets/footer.svg" alt="" width="100%">
+
+</div>

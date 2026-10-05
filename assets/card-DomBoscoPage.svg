@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="170" viewBox="0 0 400 170">
+<defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#58a6ff"/><stop offset=".5" stop-color="#bc8cff"/><stop offset="1" stop-color="#ff7bd5"/><animateTransform attributeName="gradientTransform" type="rotate" from="0 .5 .5" to="360 .5 .5" dur="6s" repeatCount="indefinite"/></linearGradient></defs>
+<rect x="1" y="1" width="398" height="168" rx="16" fill="#0d1117" stroke="url(#b)" stroke-width="2"/>
+<rect x="1" y="1" width="398" height="168" rx="16" fill="#e34f26" opacity=".05"/>
+<text x="24" y="52" font-size="26">📚<animateTransform attributeName="transform" type="rotate" values="-8 36 44;8 36 44;-8 36 44" dur="3s" repeatCount="indefinite"/></text>
+<text x="64" y="52" font-family="'JetBrains Mono','Fira Code',SFMono-Regular,Consolas,monospace" font-size="19" font-weight="700" fill="#e6edf3">DomBoscoPage</text>
+<line x1="24" y1="66" x2="24" y2="66" stroke="#bc8cff" stroke-width="2" stroke-linecap="round"><animate attributeName="x2" values="24;376;24" dur="5s" repeatCount="indefinite"/></line>
+<text x="24" y="96" font-family="'JetBrains Mono','Fira Code',SFMono-Regular,Consolas,monospace" font-size="13" fill="#8b949e">Página institucional Dom Bosco.</text>
+<circle cx="30" cy="148" r="6" fill="#e34f26"><animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite"/></circle>
+<text x="44" y="153" font-family="'JetBrains Mono','Fira Code',SFMono-Regular,Consolas,monospace" font-size="13" fill="#c9d1d9">HTML</text>
+<text x="376" y="153" text-anchor="end" font-family="'JetBrains Mono','Fira Code',SFMono-Regular,Consolas,monospace" font-size="13" fill="#58a6ff">ver projeto →</text>
+</svg>
