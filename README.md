@@ -4,7 +4,7 @@
 
 <br><br>
 
-<img src="https://img.shields.io/badge/foco-front--end-d97757?style=for-the-badge&labelColor=141413" alt="Foco em front-end">
+<img src="https://img.shields.io/badge/foco-Claude-d97757?style=for-the-badge&logo=claude&logoColor=d97757&labelColor=141413" alt="Foco: Claude">
 <img src="https://img.shields.io/badge/feito_com-Claude_Code-d97757?style=for-the-badge&logo=claude&logoColor=d97757&labelColor=141413" alt="Feito com Claude Code">
 <img src="https://img.shields.io/badge/status-dispon%C3%ADvel-8cc084?style=for-the-badge&labelColor=141413" alt="Disponível para projetos">
 <img src="https://komarev.com/ghpvc/?username=gniza&base=834&label=visitas&color=d97757&style=for-the-badge&labelColor=141413" alt="Visitas ao perfil">
