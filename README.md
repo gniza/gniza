@@ -13,16 +13,16 @@
 
 </div>
 
+<img src="assets/titulo-nizashop.svg" alt="Minha loja" width="100%">
+
+<div align="center">
+<a href="nizashop/"><img src="assets/nizashop-card.svg" alt="NizaShop, loja na Shopee. Gabriel Niza, fundador e CEO. Clique para conhecer a loja" width="100%"></a>
+</div>
+
 <img src="assets/titulo-sobre.svg" alt="Sobre mim" width="100%">
 
 <div align="center">
 <img src="assets/claude-md.svg" alt="CLAUDE.md: Gabriel Niza, desenvolvedor web que cria sites e cardápios online para negócios locais" width="100%">
-</div>
-
-<img src="assets/titulo-nizashop.svg" alt="Minha loja" width="100%">
-
-<div align="center">
-<a href="nizashop/"><img src="assets/nizashop-card.svg" alt="NizaShop, sua loja na Shopee. Gabriel Niza, fundador e CEO. Clique para conhecer a loja" width="100%"></a>
 </div>
 
 <img src="assets/titulo-stack.svg" alt="Ferramentas" width="100%">

@@ -552,7 +552,6 @@ AMEIXA, PITAYA, PESSEGO, LAVANDA, LILAS, NOITE = "#2B1646", "#E11D6A", "#FFC7AE"
 SANS = "font-family=\"Inter,'Segoe UI',Roboto,Helvetica,Arial,sans-serif\""
 SHOPEE = "#ee4d2d"
 # CONTEÚDO
-NIZA_TAGLINE = "sua loja na Shopee"
 NIZA_CEO = "Fundador & CEO · Gabriel Niza"
 NIZA_PILARES = [
     ("estrela", "Curadoria", "produtos escolhidos a dedo"),
@@ -652,12 +651,9 @@ def nizashop_hero():
     o = (f'<clipPath id="cl"><rect width="{W}" height="{H}" rx="26"/></clipPath><g clip-path="url(#cl)">'
          f'<image href="{b64(NIZA_DIR / "fundos" / "faixa-hero.jpg")}" width="{W}" height="{H}" preserveAspectRatio="xMidYMid slice"/>'
          f'{niza_glows(W, H)}{sparkles(W, H, 26)}{light_sweep(W, H)}</g>')
-    o += f'<g transform="translate(290,52) scale(.96)">{niza_logo(.6)}</g>'
-    o += (f'<g transform="translate(600,300)"><g opacity="1">{reveal(2.2, .6)}'
-          f'<g transform="translate(-142,0)">{bob(shopee_icon(40), 3, 1.8)}</g>'
-          f'<text x="-112" y="10" {SANS} font-size="28" font-weight="600" fill="#fff">{esc(NIZA_TAGLINE)}</text></g></g>')
-    o += (f'<g opacity="1">{reveal(2.6, .6)}<rect x="{W/2-190}" y="338" width="380" height="44" rx="22" fill="{LILAS}"/>'
-          f'<text x="{W/2}" y="367" text-anchor="middle" {SANS} font-size="18" font-weight="700" fill="{AMEIXA}">{esc(NIZA_CEO)}</text></g>')
+    o += f'<g transform="translate(290,72) scale(.96)">{niza_logo(.6)}</g>'
+    o += (f'<g opacity="1">{reveal(2.2, .6)}<rect x="{W/2-190}" y="312" width="380" height="44" rx="22" fill="{LILAS}"/>'
+          f'<text x="{W/2}" y="341" text-anchor="middle" {SANS} font-size="18" font-weight="700" fill="{AMEIXA}">{esc(NIZA_CEO)}</text></g>')
     o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="26" fill="none" stroke="url(#nb)" stroke-width="2"/>'
     defs = SHINE + BEAM + NBLUR + niza_border()
     (NIZA_DIR / "hero.svg").write_text(svg(W, H, o, defs), encoding="utf-8")
@@ -730,8 +726,6 @@ def nizashop_card():
     o += f'<g transform="translate(44,36) scale(.62)">{niza_logo(.4)}</g>'
     o += (f'<rect x="64" y="196" width="232" height="40" rx="20" fill="{PITAYA}"/>'
           f'<text x="180" y="222" text-anchor="middle" {SANS} font-size="17" font-weight="800" fill="#fff" letter-spacing=".5">FUNDADOR &amp; CEO</text>')
-    o += (f'<g transform="translate(336,216)">{shopee_icon(34)}</g>'
-          f'<text x="364" y="223" {SANS} font-size="20" font-weight="600" fill="#fff">{esc(NIZA_TAGLINE)}</text>')
     btn = (f'<rect width="196" height="46" rx="23" fill="{LILAS}"/>'
            f'<text x="98" y="29" text-anchor="middle" {SANS} font-size="18" font-weight="800" fill="{AMEIXA}">conhecer a loja →</text>')
     o += f'<g transform="translate({W-250},196)">{bob(btn, 3, 1.6)}</g>'
