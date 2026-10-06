@@ -30,9 +30,9 @@
 <div align="center">
 <a href="nizashop/"><img src="assets/nizashop-destaque.svg" alt="NizaShop, loja na Shopee. Gabriel Niza, fundador e CEO. Loja criada com Claude, Gemini e TryBloom" width="100%"></a>
 <br><br>
-<a href="nizashop/"><img src="assets/nizashop-vitrine.svg" alt="Vitrine com os banners da NizaShop: boas-vindas, cupons, 10.10, 11.11, 12.12, Black Friday e Natal" width="100%"></a>
+<a href="nizashop/"><img src="assets/nizashop-unboxing.svg" alt="Unboxing da NizaShop: caixa que se abre com cartão, selo e etiqueta feitos com carinho" width="100%"></a>
 <br><br>
-<a href="nizashop/"><img src="assets/nizashop-bento.svg" alt="Painel da NizaShop: loja na Shopee no celular, calendário de campanhas, tráfego com IA, embalagem feita com carinho e notificações de pedidos" width="100%"></a>
+<a href="nizashop/"><img src="assets/nizashop-bento.svg" alt="Painel da NizaShop: loja na Shopee no celular, calendário de campanhas, tráfego com IA, cupons da loja e notificações de pedidos" width="100%"></a>
 </div>
 
 <img src="assets/titulo-projetos.svg" alt="Projetos em destaque" width="100%">

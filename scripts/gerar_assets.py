@@ -764,32 +764,6 @@ def nizashop_card():
     save("nizashop-destaque.svg", svg(W, H, o, SHINE + BEAM + NBLUR + GEM + niza_border()))
 
 
-def nizashop_vitrine():
-    """Carrossel infinito com os banners da loja (assets/nizashop-vitrine.svg)."""
-    import base64, io
-    from PIL import Image
-    banners = sorted((NIZA_DIR / "banners").glob("*.jpg"))
-    W, H, bw, bh, g = 1200, 250, 400, 200, 20
-    defs = f'<clipPath id="rc"><rect width="{bw}" height="{bh}" rx="16"/></clipPath>'
-    for i, f in enumerate(banners):
-        buf = io.BytesIO()
-        Image.open(f).convert("RGB").resize((bw, bh), Image.LANCZOS).save(buf, "JPEG", quality=70, optimize=True, progressive=True)
-        href = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
-        defs += (f'<g id="b{i}"><image href="{href}" width="{bw}" height="{bh}" clip-path="url(#rc)"/>'
-                 f'<rect width="{bw}" height="{bh}" rx="16" fill="none" stroke="{LILAS}" stroke-opacity=".35"/></g>')
-    period = len(banners) * (bw + g)
-    strip = "".join(f'<use href="#b{i % len(banners)}" x="{i*(bw+g)}" y="25"/>' for i in range(len(banners) * 2))
-    o = (f'<clipPath id="fr"><rect width="{W}" height="{H}" rx="22"/></clipPath><g clip-path="url(#fr)">'
-         f'<rect width="{W}" height="{H}" fill="{AMEIXA}"/>{niza_glows(W, H)}'
-         f'<g><animateTransform attributeName="transform" type="translate" from="0 0" to="-{period} 0" dur="{len(banners)*5}s" repeatCount="indefinite"/>{strip}</g>'
-         f'<rect width="140" height="{H}" fill="url(#fl)"/><rect x="{W-140}" width="140" height="{H}" fill="url(#frr)"/></g>'
-         f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="22" fill="none" stroke="url(#nb)" stroke-width="2.5"/>')
-    defs += (f'<linearGradient id="fl" x1="0" x2="1"><stop offset="0" stop-color="{AMEIXA}"/><stop offset="1" stop-color="{AMEIXA}" stop-opacity="0"/></linearGradient>'
-             f'<linearGradient id="frr" x1="0" x2="1"><stop offset="0" stop-color="{AMEIXA}" stop-opacity="0"/><stop offset="1" stop-color="{AMEIXA}"/></linearGradient>'
-             + NBLUR + niza_border())
-    save("nizashop-vitrine.svg", svg(W, H, o, defs))
-
-
 def data_uri(path, size=None, fmt="JPEG", quality=72, crop=None):
     """Imagem redimensionada embutida como data URI (para usar dentro dos SVGs)."""
     import base64, io
@@ -921,14 +895,28 @@ def bento_trafego(w, h):
     return o
 
 
-def bento_selo(w, h):
-    size = 158
-    o = (f'<g transform="translate({w/2},{h/2+14})"><g>'
-         f'<animateTransform attributeName="transform" type="rotate" values="-7;7;-7" dur="5s" repeatCount="indefinite" '
+def bento_cupom(w, h):
+    tw, th = w - 52, 118
+    x0, y0 = 26, 70
+    cut = tw * .36
+    ticket = (f'<rect width="{tw}" height="{th}" rx="16" fill="{LAVANDA}"/>'
+              f'<rect width="{cut:.0f}" height="{th}" rx="16" fill="{PITAYA}"/><rect x="{cut-16:.0f}" width="16" height="{th}" fill="{PITAYA}"/>'
+              f'<circle cx="{cut:.0f}" cy="0" r="11" fill="{AMEIXA}"/><circle cx="{cut:.0f}" cy="{th}" r="11" fill="{AMEIXA}"/>'
+              f'<line x1="{cut:.0f}" y1="16" x2="{cut:.0f}" y2="{th-16}" stroke="{AMEIXA}" stroke-width="2.5" stroke-dasharray="5 6">'
+              f'<animate attributeName="stroke-dashoffset" from="0" to="-22" dur="1.2s" repeatCount="indefinite"/></line>'
+              f'<text x="{cut/2:.0f}" y="{th/2+22}" text-anchor="middle" {SANS} font-size="62" font-weight="900" fill="#fff">%</text>'
+              f'<text x="{cut + 16:.0f}" y="{th/2-6}" {SANS} font-size="19" font-weight="900" fill="{AMEIXA}">Cupons</text>'
+              f'<text x="{cut + 16:.0f}" y="{th/2+16}" {SANS} font-size="19" font-weight="900" fill="{AMEIXA}">da loja</text>'
+              f'<rect x="0" y="0" width="{tw}" height="{th}" rx="16" fill="url(#cshine)"/>')
+    o = (f'<g transform="translate({x0 + tw/2},{y0 + th/2})"><g>'
+         f'<animateTransform attributeName="transform" type="rotate" values="-4;3;-4" dur="4s" repeatCount="indefinite" '
          f'calcMode="spline" keyTimes="0;.5;1" keySplines=".4 0 .6 1;.4 0 .6 1"/>'
-         f'{bob(f"""<image href="{data_uri(NIZA_DIR / "embalagem" / "selo-feito-com-carinho.png", (size*2, size*2), "PNG")}" x="{-size/2}" y="{-size/2}" width="{size}" height="{size}"/>""", 5, 2.2)}'
-         f'</g></g>')
-    return o + f'<g transform="translate({w-40},40)">{niza_icon("coracao", PITAYA)}</g>'
+         f'<g transform="translate({-tw/2},{-th/2})">{bob(ticket, 4, 2.2)}</g></g></g>')
+    o += f'<text x="26" y="{h-26}" {SANS} font-size="13.5" fill="{LILAS}">pegue o seu antes de comprar</text>'
+    for k, (dx, dy, fs) in enumerate(((w - 46, 46, 18), (w - 70, 64, 12), (w - 34, 78, 13))):
+        o += (f'<text x="{dx}" y="{dy}" {SANS} font-size="{fs}" font-weight="900" fill="{PESSEGO}">%'
+              f'<animate attributeName="opacity" values="0;1;0" dur="2.4s" begin="{-k*.8:.1f}s" repeatCount="indefinite"/></text>')
+    return o
 
 
 def bento_avisos(w, h):
@@ -976,20 +964,168 @@ def nizashop_bento():
          + bento_tile(P, P, pw, H - 2 * P, "LOJA NA SHOPEE", phone, 0)
          + bento_tile(rx0, P, cal_w, th, "CALENDÁRIO DE CAMPANHAS", bento_calendario(cal_w, th), 1)
          + bento_tile(rx0 + cal_w + G, P, rw - cal_w - G, th, "TRÁFEGO COM IA", bento_trafego(rw - cal_w - G, th), 2)
-         + bento_tile(rx0, P + th + G, sel_w, th, "EMBALAGEM", bento_selo(sel_w, th), 3)
+         + bento_tile(rx0, P + th + G, sel_w, th, "CUPONS", bento_cupom(sel_w, th), 3)
          + bento_tile(rx0 + sel_w + G, P + th + G, rw - sel_w - G, th, "NOTIFICAÇÕES", bento_avisos(rw - sel_w - G, th), 4)
          + f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="28" fill="none" stroke="url(#nb)" stroke-width="2.5"/>')
     tgs = "".join(f'<radialGradient id="tg{i}" cx="{cx}" cy="{cy}" r=".9"><stop offset="0" stop-color="{c}" stop-opacity=".28"/>'
                   f'<stop offset="1" stop-color="{c}" stop-opacity="0"/></radialGradient>'
                   for i, (c, cx, cy) in enumerate([(LILAS, .5, .9), (PITAYA, .1, .1), (SHOPEE, .9, .1), (PESSEGO, .5, .5), (LILAS, .9, .9)]))
     defs = (tgs + phone_defs + NBLUR + niza_border()
+            + '<linearGradient id="cshine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="120" y2="0">'
+              '<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".45"/>'
+              '<stop offset="1" stop-color="#fff" stop-opacity="0"/>'
+              '<animateTransform attributeName="gradientTransform" type="translate" values="-160 0;-160 0;420 0" keyTimes="0;.6;1" dur="3.5s" repeatCount="indefinite"/></linearGradient>'
             + f'<linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{SHOPEE}" stop-opacity=".35"/><stop offset="1" stop-color="{SHOPEE}" stop-opacity="0"/></linearGradient>'
             + f'<linearGradient id="scan" x1="0" x2="1"><stop offset="0" stop-color="{LILAS}" stop-opacity="0"/><stop offset="1" stop-color="{LILAS}" stop-opacity=".35"/></linearGradient>')
     save("nizashop-bento.svg", svg(W, H, o, defs))
 
 
+# CONTEÚDO do unboxing
+UNBOX_TITULO = ("Cada pedido,", "uma experiência")
+UNBOX_SUB = ("embalagem própria, cartão de agradecimento", "e selo feito com carinho")
+UNBOX_ITENS = [("fita personalizada", PITAYA), ("papel de seda", LILAS), ("cartão + selo", PESSEGO)]
+
+
+def tl(pairs, T):
+    """Linha do tempo [(segundo, valor), ...] -> (keyTimes, values) para animações SMIL."""
+    kt = ";".join(f"{min(t / T, 1):.4f}" for t, _ in pairs)
+    return kt, ";".join(str(v) for _, v in pairs)
+
+
+def anim(attr, pairs, T, kind=None, extra=""):
+    kt, vals = tl(pairs, T)
+    if kind:
+        return (f'<animateTransform attributeName="transform" type="{kind}" dur="{T}s" repeatCount="indefinite" '
+                f'keyTimes="{kt}" values="{vals}" {extra}/>')
+    return f'<animate attributeName="{attr}" dur="{T}s" repeatCount="indefinite" keyTimes="{kt}" values="{vals}" {extra}/>'
+
+
+def nizashop_unboxing():
+    """Caixa da NizaShop que se abre e revela o kit de embalagem (assets/nizashop-unboxing.svg)."""
+    W, H, T = 1200, 430, 9.0
+    E = NIZA_DIR / "embalagem"
+    cx, ty, a, b, h = 840, 238, 120, 60, 95
+    P = lambda x, y: f"{x:.1f},{y:.1f}"
+    T0, T1, T2, T3 = (cx, ty - b), (cx + a, ty), (cx, ty + b), (cx - a, ty)
+    M1 = ((T0[0] + T3[0]) / 2, (T0[1] + T3[1]) / 2)
+    M2 = ((T2[0] + T1[0]) / 2, (T2[1] + T1[1]) / 2)
+
+    o = (f'<clipPath id="cl"><rect width="{W}" height="{H}" rx="22"/></clipPath><g clip-path="url(#cl)">'
+         f'<rect width="{W}" height="{H}" fill="{NOITE}"/>{niza_glows(W, H)}'
+         f'<ellipse cx="{cx}" cy="{ty - 20}" rx="330" ry="210" fill="url(#spot)"/>{sparkles(W, H, 22)}</g>')
+
+    # ---------- texto ----------
+    o += f'<text x="56" y="92" {SANS} font-size="13" font-weight="800" fill="{LILAS}" letter-spacing="2">UNBOXING NIZASHOP</text>'
+    for i, line in enumerate(UNBOX_TITULO):
+        o += f'<text x="54" y="{156 + i*56}" {SANS} font-size="50" font-weight="900" fill="#fff" letter-spacing="-1.5">{esc(line)}{reveal(.2 + i*.2, .5)}</text>'
+    for i, line in enumerate(UNBOX_SUB):
+        o += f'<text x="56" y="{262 + i*26}" {SANS} font-size="18" fill="{LILAS}">{esc(line)}{reveal(.7, .5)}</text>'
+    x = 56
+    for i, (txt, c) in enumerate(UNBOX_ITENS):
+        w = len(txt) * 8.6 + 44
+        o += (f'<g transform="translate({x:.0f},326)"><g opacity="1">{reveal(1 + i*.25, .4)}'
+              f'<rect width="{w:.0f}" height="34" rx="17" fill="#fff" fill-opacity=".07" stroke="{c}" stroke-opacity=".6"/>'
+              f'<circle cx="18" cy="17" r="5" fill="{c}"/>'
+              f'<text x="32" y="22" {SANS} font-size="14" font-weight="700" fill="#fff">{esc(txt)}</text></g></g>')
+        x += w + 10
+
+    # ---------- caixa ----------
+    def flap(hinge, free, up_dir, out_k):
+        (h1, h2), (f1, f2) = hinge, free
+        def pts(q1, q2):
+            return f"{P(*h1)} {P(*h2)} {P(*q2)} {P(*q1)}"
+        closed = pts(f1, f2)
+        L = 58
+        up = pts((h1[0], h1[1] - L), (h2[0], h2[1] - L))
+        o1 = (h1[0] - out_k * (f1[0] - h1[0]), h1[1] - out_k * (f1[1] - h1[1]) - 26)
+        o2 = (h2[0] - out_k * (f2[0] - h2[0]), h2[1] - out_k * (f2[1] - h2[1]) - 26)
+        opened = pts(o1, o2)
+        seq = [(0, closed), (.9, closed), (1.5, up), (2.0, opened), (7.9, opened), (8.4, up), (8.9, closed), (T, closed)]
+        return opened, anim("points", seq, T)
+
+    fa_open, fa_anim = flap((T3, T2), (M1, M2), -1, .7)   # aba da frente
+    fb_open, fb_anim = flap((T0, T1), (M1, M2), -1, .7)   # aba de trás
+    box = ""
+    box += f'<polygon points="{fb_open}" fill="#4a2a73" stroke="{LILAS}" stroke-opacity=".35">{fb_anim}</polygon>'
+    # interior com papel de seda
+    top_pts = f"{P(*T0)} {P(*T1)} {P(*T2)} {P(*T3)}"
+    seda = data_uri(E / "papel-de-seda.jpg", (300, 300))
+    dz = 46  # profundidade em que o papel de seda aparece
+    sh_pts = f"{P(T0[0], T0[1]+dz)} {P(T1[0], T1[1]+dz)} {P(T2[0], T2[1]+dz)} {P(T3[0], T3[1]+dz)}"
+    box += (f'<g opacity="1">{anim("opacity", [(0, 0), (1.3, 0), (1.7, 1), (8.3, 1), (8.6, 0), (T, 0)], T)}'
+            f'<clipPath id="boca"><polygon points="{top_pts}"/></clipPath><clipPath id="seda"><polygon points="{sh_pts}"/></clipPath>'
+            f'<g clip-path="url(#boca)"><polygon points="{top_pts}" fill="#0e0816"/>'
+            f'<polygon points="{P(*T3)} {P(*T0)} {P(T0[0], T0[1]+h)} {P(T3[0], T3[1]+h)}" fill="#2a1842"/>'
+            f'<polygon points="{P(*T0)} {P(*T1)} {P(T1[0], T1[1]+h)} {P(T0[0], T0[1]+h)}" fill="#1c1030"/>'
+            f'<image href="{seda}" x="{cx - a}" y="{ty - b + dz - 60}" width="{2*a}" height="{2*a}" clip-path="url(#seda)"/>'
+            f'<polygon points="{sh_pts}" fill="url(#fundo)"/></g></g>')
+    # itens (atrás das faces da frente)
+    def item(img_href, w, h_, final, rot_end, t_in, spin=False):
+        fx, fy = final
+        st = (cx, ty + 30)
+        tr = anim(None, [(0, f"{st[0]} {st[1]}"), (t_in, f"{st[0]} {st[1]}"), (t_in + .7, f"{fx} {fy}"),
+                         (7.4, f"{fx} {fy}"), (8.0, f"{st[0]} {st[1]}"), (T, f"{st[0]} {st[1]}")], T, "translate",
+                  'calcMode="spline" keySplines="0 0 1 1;.2 1.4 .4 1;0 0 1 1;.5 0 .8 .4;0 0 1 1"')
+        sc = anim(None, [(0, ".2"), (t_in, ".2"), (t_in + .7, "1"), (7.4, "1"), (8.0, ".2"), (T, ".2")], T, "scale")
+        r0 = -200 if spin else 0
+        rt = anim(None, [(0, r0), (t_in, r0), (t_in + .9, rot_end), (7.4, rot_end), (8.0, r0), (T, r0)], T, "rotate",
+                  'calcMode="spline" keySplines="0 0 1 1;.2 1.3 .4 1;0 0 1 1;0 0 1 1;0 0 1 1"')
+        op = anim("opacity", [(0, 0), (t_in, 0), (t_in + .25, 1), (7.7, 1), (8.0, 0), (T, 0)], T)
+        return (f'<g transform="translate({fx},{fy})">{tr}<g opacity="1">{op}<g>{sc}<g transform="rotate({rot_end})">{rt}'
+                f'{bob(f"""<image href="{img_href}" x="{-w/2}" y="{-h_/2}" width="{w}" height="{h_}"/>""", 5, 2.6)}'
+                f'</g></g></g></g>')
+    box += item(data_uri(E / "etiqueta-abra-com-carinho.png", (320, 160), "PNG"), 170, 85, (cx - 190, ty - 70), -10, 3.2)
+    box += item(data_uri(E / "cartao-gostou-do-pedido.jpg", (220, 330)), 104, 156, (cx - 6, ty - 132), 6, 2.3)
+    box += item(data_uri(E / "selo-feito-com-carinho.png", (220, 220), "PNG"), 116, 116, (cx + 178, ty - 78), 0, 2.8, spin=True)
+    # confetes
+    random.seed(5)
+    conf = ""
+    for k in range(22):
+        ang = random.uniform(math.pi * 1.05, math.pi * 1.95)
+        dist = random.uniform(130, 250)
+        dx, dy = math.cos(ang) * dist, math.sin(ang) * dist
+        c = random.choice([PITAYA, PESSEGO, LILAS, "#ffffff"])
+        t0 = 2.2 + random.uniform(0, .3)
+        shape = (f'<rect x="-4" y="-2" width="8" height="4" rx="1" fill="{c}"/>' if k % 2 else f'<circle r="3" fill="{c}"/>')
+        fade = anim("opacity", [(0, 0), (t0, 0), (t0 + .1, 1), (t0 + 1.2, 1), (t0 + 1.7, 0), (T, 0)], T)
+        fly = anim(None, [(0, f"{cx} {ty}"), (t0, f"{cx} {ty}"), (t0 + 1.7, f"{cx+dx:.0f} {ty+dy+60:.0f}"),
+                          (T, f"{cx+dx:.0f} {ty+dy+60:.0f}")], T, "translate",
+                   'calcMode="spline" keySplines="0 0 1 1;.1 .7 .3 1;0 0 1 1"')
+        spin = anim(None, [(0, 0), (t0, 0), (t0 + 1.7, random.choice([-1, 1]) * 540), (T, 0)], T, "rotate")
+        conf += f'<g opacity="0">{fade}<g>{fly}<g>{spin}{shape}</g></g></g>'
+    box += conf
+    # faces da frente
+    hp = lambda q: (q[0], q[1] + h)
+    box += f'<polygon points="{P(*T3)} {P(*T2)} {P(*hp(T2))} {P(*hp(T3))}" fill="#3c2160"/>'
+    box += f'<polygon points="{P(*T2)} {P(*T1)} {P(*hp(T1))} {P(*hp(T2))}" fill="{AMEIXA}"/>'
+    box += f'<line x1="{T2[0]}" y1="{T2[1]}" x2="{T2[0]}" y2="{T2[1]+h}" stroke="{LILAS}" stroke-opacity=".35"/>'
+    # símbolo da loja na face direita
+    n_path, _ = niza_parts()
+    sx, sy = (T2[0] + T1[0]) / 2, (T2[1] + T1[1]) / 2 + h / 2
+    box += (f'<g transform="matrix({a/120:.3f},{-b/120:.3f},0,1,{sx:.1f},{sy:.1f}) translate(-22,-22) scale(.69)">'
+            f'<rect width="64" height="64" rx="18" fill="{LAVANDA}"/><path d="{n_path}" fill="{AMEIXA}" stroke="{AMEIXA}" stroke-width="2" stroke-linejoin="round"/>'
+            f'<circle cx="42.5" cy="17" r="4.2" fill="{PITAYA}"/></g>')
+    # fita na face esquerda (desce da tampa)
+    fita = data_uri(E / "fita-adesiva.jpg", (600, 50))
+    fl = (f'<g opacity="1">{anim("opacity", [(0, 1), (.8, 1), (1.0, 0), (8.8, 0), (9.0, 1)], T)}'
+          f'<g transform="matrix({(M2[0]-M1[0])/600:.4f},{(M2[1]-M1[1])/600:.4f},{-a*.16/50:.4f},{b*.16/50:.4f},{M1[0] + a*.08:.1f},{M1[1] - b*.08:.1f})">'
+          f'<image href="{fita}" width="600" height="50"/></g></g>')
+    box += f'<polygon points="{fa_open}" fill="#5a3388" stroke="{LILAS}" stroke-opacity=".4">{fa_anim}</polygon>'
+    box += fl
+    shadow = (f'<ellipse cx="{cx}" cy="{ty + b + h + 6}" rx="150" ry="16" fill="#000" opacity=".4">'
+              f'{anim("rx", [(0, 90), (.35, 150), (.5, 135), (.65, 150), (T, 150)], T)}</ellipse>')
+    drop = anim(None, [(0, "0 -34"), (.35, "0 0"), (.5, "0 -7"), (.65, "0 0"), (T, "0 0")], T, "translate")
+    o += shadow + f'<g>{drop}{box}</g>'
+    o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="22" fill="none" stroke="url(#nb)" stroke-width="2.5"/>'
+    defs = (NBLUR + niza_border()
+            + f'<linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e0816" stop-opacity=".75"/>'
+              f'<stop offset="1" stop-color="#0e0816" stop-opacity=".1"/></linearGradient>'
+            + f'<radialGradient id="spot"><stop offset="0" stop-color="{LILAS}" stop-opacity=".38"/><stop offset="1" stop-color="{LILAS}" stop-opacity="0"/></radialGradient>')
+    save("nizashop-unboxing.svg", svg(W, H, o, defs))
+
+
 def nizashop():
-    nizashop_hero(); nizashop_pilares(); nizashop_paleta(); nizashop_card(); nizashop_vitrine(); nizashop_bento()
+    nizashop_hero(); nizashop_pilares(); nizashop_paleta(); nizashop_card(); nizashop_unboxing(); nizashop_bento()
 
 
 if __name__ == "__main__":
