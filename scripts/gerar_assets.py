@@ -790,8 +790,206 @@ def nizashop_vitrine():
     save("nizashop-vitrine.svg", svg(W, H, o, defs))
 
 
+def data_uri(path, size=None, fmt="JPEG", quality=72, crop=None):
+    """Imagem redimensionada embutida como data URI (para usar dentro dos SVGs)."""
+    import base64, io
+    from PIL import Image
+    im = Image.open(path)
+    if crop:
+        w0, h0 = im.size
+        im = im.crop(tuple(int(v * d) for v, d in zip(crop, (w0, h0, w0, h0))))
+    if size:
+        im = im.resize(size, Image.LANCZOS)
+    buf = io.BytesIO()
+    if fmt == "JPEG":
+        im.convert("RGB").save(buf, "JPEG", quality=quality, optimize=True, progressive=True)
+    else:
+        im.save(buf, fmt, optimize=True)
+    return f"data:image/{fmt.lower()};base64," + base64.b64encode(buf.getvalue()).decode()
+
+
+# CONTEÚDO do painel bento
+BENTO_CAMPANHAS = [("10.10", "#b8a4e3"), ("11.11", "#7d9bff"), ("12.12", "#e0a3c4"), ("Black Friday", "#ffffff"), ("Natal", "#6ee7b7")]
+BENTO_AVISOS = [
+    ("pedido", "Novo pedido recebido", PITAYA),
+    ("coracao", "Pedido embalado com carinho", PESSEGO),
+    ("entrega", "Saiu para entrega", LILAS),
+    ("estrela", "Nova avaliação ★★★★★", "#ffd166"),
+]
+
+
+def bento_tile(x, y, w, h, label, inner, i, glow=LILAS):
+    return (f'<g transform="translate({x},{y})"><g opacity="1">{reveal(.15 + i * .18, .5)}'
+            f'<rect width="{w}" height="{h}" rx="24" fill="{AMEIXA}"/>'
+            f'<rect width="{w}" height="{h}" rx="24" fill="url(#tg{i})"/>'
+            f'<rect x=".75" y=".75" width="{w-1.5}" height="{h-1.5}" rx="24" fill="none" stroke="{LILAS}" stroke-opacity=".28" stroke-width="1.5"/>'
+            f'<text x="24" y="38" {SANS} font-size="12.5" font-weight="800" fill="{LILAS}" letter-spacing="1.6">{esc(label)}</text>'
+            f'{inner}</g></g>')
+
+
+def bento_phone(w, h):
+    pw, ph = 214, 440
+    px, py = (w - pw) / 2, 58
+    sx, sy, sw, sh = px + 9, py + 9, pw - 18, ph - 18
+    n_path, _ = niza_parts()
+    o = (f'<rect x="{px}" y="{py}" width="{pw}" height="{ph}" rx="36" fill="#0c0912" stroke="#3b2d52" stroke-width="3"/>'
+         f'<clipPath id="scr"><rect x="{sx}" y="{sy}" width="{sw}" height="{sh}" rx="28"/></clipPath><g clip-path="url(#scr)">'
+         f'<image href="{data_uri(NIZA_DIR / "fundos" / "plano-de-fundo-05-ameixa-com-brilho.jpg", (int(sw), int(sh)), crop=(.27, 0, .73, .46))}" '
+         f'x="{sx}" y="{sy}" width="{sw}" height="{sh}" preserveAspectRatio="xMidYMid slice"/>')
+    # cabeçalho da loja
+    hx, hy = sx + 14, sy + 38
+    o += (f'<g transform="translate({hx},{hy}) scale(.56)"><rect width="64" height="64" rx="18" fill="{LAVANDA}"/>'
+          f'<path d="{n_path}" fill="{AMEIXA}" stroke="{AMEIXA}" stroke-width="2" stroke-linejoin="round"/>'
+          f'<circle cx="42.5" cy="17" r="4.2" fill="{PITAYA}"/></g>'
+          f'<text x="{hx+46}" y="{hy+17}" {SANS} font-size="15" font-weight="800" fill="#fff">Niza<tspan font-weight="400">shop</tspan></text>'
+          f'<text x="{hx+46}" y="{hy+33}" {SANS} font-size="10.5" fill="{LILAS}">loja na Shopee</text>')
+    o += (f'<g transform="translate({sx+sw-62},{hy+8})"><rect width="50" height="22" rx="11" fill="{PITAYA}">'
+          f'<animate attributeName="opacity" values="1;.65;1" dur="1.6s" repeatCount="indefinite"/></rect>'
+          f'<text x="25" y="15" text-anchor="middle" {SANS} font-size="10.5" font-weight="800" fill="#fff">Seguir</text></g>')
+    o += f'<g transform="translate({sx+sw/2},{sy+10})"><rect x="-30" y="-1" width="60" height="16" rx="8" fill="#0c0912"/></g>'
+    # banners rolando em "swipes"
+    banners = sorted((NIZA_DIR / "banners").glob("*.jpg"))
+    bw = sw - 24
+    bh = bw / 2
+    gap = 12
+    step = bh + gap
+    top = hy + 52
+    defs_imgs = ""
+    col = ""
+    for k in range(len(banners) * 2):
+        f = banners[k % len(banners)]
+        if k < len(banners):
+            defs_imgs += f'<image id="pb{k}" href="{data_uri(f, (int(bw*2), int(bh*2)))}" width="{bw:.1f}" height="{bh:.1f}" clip-path="url(#pbc)"/>'
+        col += f'<use href="#pb{k % len(banners)}" x="{sx+12}" y="{top + k*step:.1f}"/>'
+    n = len(banners)
+    T = n * 2.0
+    kt, vals = [], []
+    for k in range(n):
+        kt += [k * 2.0 / T, (k * 2.0 + 1.4) / T]
+        vals += [f"0 {-k*step:.1f}", f"0 {-k*step:.1f}"]
+    kt.append(1)
+    vals.append(f"0 {-n*step:.1f}")
+    splines = ";".join(["0 0 1 1", ".6 0 .2 1"] * n)
+    o += (f'<clipPath id="feed"><rect x="{sx}" y="{top-4}" width="{sw}" height="{sy+sh-top+4}"/></clipPath>'
+          f'<g clip-path="url(#feed)"><g><animateTransform attributeName="transform" type="translate" dur="{T}s" repeatCount="indefinite" '
+          f'calcMode="spline" keyTimes="{";".join(f"{t:.4f}" for t in kt)}" values="{";".join(vals)}" keySplines="{splines}"/>{col}</g></g>')
+    o += '</g>'
+    defs = f'<clipPath id="pbc"><rect width="{bw:.1f}" height="{bh:.1f}" rx="10"/></clipPath>{defs_imgs}'
+    return o, defs
+
+
+def bento_calendario(w, h):
+    T = len(BENTO_CAMPANHAS) * 2.4
+    cx, cy = w / 2, 150
+    o = (f'<rect x="28" y="62" width="{w-56}" height="150" rx="18" fill="{NOITE}" fill-opacity=".7"/>'
+         f'<line x1="28" y1="{cy-13}" x2="{w-28}" y2="{cy-13}" stroke="{AMEIXA}" stroke-width="3"/>')
+    dots = ""
+    for i, (txt, c) in enumerate(BENTO_CAMPANHAS):
+        a, b = i / len(BENTO_CAMPANHAS), (i + 1) / len(BENTO_CAMPANHAS)
+        e = .25 / T
+        if i == 0:
+            kt, vals = f"0;{b-e:.4f};{b:.4f};{1-e:.4f};1", "1 1;1 1;1 0;1 0;1 1"
+        else:
+            kt, vals = f"0;{a:.4f};{a+e:.4f};{b-e:.4f};{b:.4f};1", "1 0;1 0;1 1;1 1;1 0;1 0"
+        fs = 92 if len(txt) <= 5 else 62
+        base = "" if i == 0 else ' transform="scale(1,0)"'
+        o += (f'<g transform="translate({cx},{cy-13})"><g{base}><animateTransform attributeName="transform" type="scale" '
+              f'dur="{T}s" repeatCount="indefinite" keyTimes="{kt}" values="{vals}"/>'
+              f'<text y="{fs*.36:.0f}" text-anchor="middle" {SANS} font-size="{fs}" font-weight="900" fill="{c}" letter-spacing="-2">{esc(txt)}</text></g></g>')
+        dots += (f'<circle cx="{cx - 48 + i*24}" cy="236" r="5" fill="{c}" opacity=".3">'
+                 f'<animate attributeName="opacity" dur="{T}s" repeatCount="indefinite" calcMode="discrete" '
+                 f'keyTimes="0;{a:.4f};{b:.4f}" values=".3;1;.3"/></circle>')
+    return o + dots
+
+
+def bento_trafego(w, h):
+    o = f'<g transform="translate({w-44},40)">{bob(shopee_icon(34), 3, 1.6)}</g>'
+    x0, x1, yb = 26, w - 26, 196
+    pts = [(x0, 186), (x0 + 40, 176), (x0 + 75, 181), (x0 + 115, 156), (x0 + 150, 162), (x0 + 190, 128), (x0 + 225, 136), (x0 + 262, 98), (x1, 76)]
+    line = " ".join(f"{x:.0f},{y}" for x, y in pts)
+    area = f"M{x0} {yb} L" + " L".join(f"{x:.0f} {y}" for x, y in pts) + f" L{x1} {yb} Z"
+    o += (f'<path d="{area}" fill="url(#ar)"/>'
+          f'<polyline points="{line}" fill="none" stroke="{SHOPEE}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" '
+          f'pathLength="1" stroke-dasharray="1" stroke-dashoffset="0">'
+          f'<animate attributeName="stroke-dashoffset" values="1;0;0;1" keyTimes="0;.4;.9;1" dur="6s" repeatCount="indefinite"/></polyline>'
+          f'<circle r="6" fill="{SHOPEE}" cx="{x1}" cy="76"><animate attributeName="r" values="5;8;5" dur="1.4s" repeatCount="indefinite"/></circle>')
+    o += (f'<rect x="{x0}" y="66" width="46" height="132" fill="url(#scan)">'
+          f'<animate attributeName="x" values="{x0-46};{x1}" dur="3s" repeatCount="indefinite"/></rect>')
+    o += (f'<rect x="{x0}" y="212" width="{w-52}" height="30" rx="15" fill="#fff" fill-opacity=".08" stroke="{LILAS}" stroke-opacity=".3"/>'
+          f'<circle cx="{x0+18}" cy="227" r="5" fill="#6ee7b7"><animate attributeName="opacity" values="1;.3;1" dur="1.2s" repeatCount="indefinite"/></circle>'
+          f'<text x="{x0+32}" y="232" {SANS} font-size="13.5" font-weight="700" fill="#fff">IA otimizando anúncios</text>')
+    return o
+
+
+def bento_selo(w, h):
+    size = 158
+    o = (f'<g transform="translate({w/2},{h/2+14})"><g>'
+         f'<animateTransform attributeName="transform" type="rotate" values="-7;7;-7" dur="5s" repeatCount="indefinite" '
+         f'calcMode="spline" keyTimes="0;.5;1" keySplines=".4 0 .6 1;.4 0 .6 1"/>'
+         f'{bob(f"""<image href="{data_uri(NIZA_DIR / "embalagem" / "selo-feito-com-carinho.png", (size*2, size*2), "PNG")}" x="{-size/2}" y="{-size/2}" width="{size}" height="{size}"/>""", 5, 2.2)}'
+         f'</g></g>')
+    return o + f'<g transform="translate({w-40},40)">{niza_icon("coracao", PITAYA)}</g>'
+
+
+def bento_avisos(w, h):
+    T, n = 8.0, len(BENTO_AVISOS)
+    slot = 58
+    o = f'<clipPath id="nt"><rect x="0" y="52" width="{w}" height="{h-60}"/></clipPath><g clip-path="url(#nt)">'
+    for i, (ic, txt, c) in enumerate(BENTO_AVISOS):
+        if ic == "pedido":
+            glyph = '<path d="M-5 0H5M0 -5V5" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>'
+        elif ic == "coracao":
+            glyph = f'<g transform="scale(.5)">{niza_icon("coracao", AMEIXA)}</g>'
+        elif ic == "entrega":
+            glyph = f'<path d="M-6 0H5M1 -5L6 0L1 5" fill="none" stroke="{AMEIXA}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'
+        else:
+            glyph = f'<g transform="scale(.45)">{niza_icon("estrela", AMEIXA)}</g>'
+        toast = (f'<rect width="{w-48}" height="48" rx="16" fill="#ffffff" fill-opacity=".09" stroke="#ffffff" stroke-opacity=".16"/>'
+                 f'<g transform="translate(26,24)"><circle r="15" fill="{c}"/>{glyph}</g>'
+                 f'<text x="54" y="21" {SANS} font-size="14.5" font-weight="700" fill="#fff">{esc(txt)}</text>'
+                 f'<text x="54" y="38" {SANS} font-size="11.5" fill="{LILAS}">NizaShop · agora</text>')
+        y0 = 62
+        vals = [f"24 {y0-30}", f"24 {y0}", f"24 {y0}", f"24 {y0+slot}", f"24 {y0+slot}", f"24 {y0+2*slot}", f"24 {y0+2*slot}", f"24 {y0+3*slot}", f"24 {y0+3*slot}"]
+        kts = [0, .4, 2, 2.4, 4, 4.4, 6, 6.4, T]
+        ops = "0;1;1;1;1;1;1;0;0"
+        kt = ";".join(f"{t/T:.4f}" for t in kts)
+        begin = -((T - i * 2) % T)
+        base_y = y0 + ((n - 1 - i) % n) * slot
+        o += (f'<g transform="translate(24,{base_y})"><animateTransform attributeName="transform" type="translate" dur="{T}s" begin="{begin}s" '
+              f'repeatCount="indefinite" keyTimes="{kt}" values="{";".join(vals)}" calcMode="spline" '
+              f'keySplines="{";".join([".3 0 .2 1", "0 0 1 1"] * 4)}"/>'
+              f'<animate attributeName="opacity" dur="{T}s" begin="{begin}s" repeatCount="indefinite" keyTimes="{kt}" values="{ops}"/>'
+              f'{toast}</g>')
+    return o + '</g>'
+
+
+def nizashop_bento():
+    """Painel bento animado da loja (assets/nizashop-bento.svg)."""
+    W, H, P, G = 1200, 560, 20, 16
+    pw = 300
+    rx0 = P + pw + G
+    rw = W - P - rx0
+    th = (H - 2 * P - G) / 2
+    cal_w, sel_w = 480, 300
+    phone, phone_defs = bento_phone(pw, H - 2 * P)
+    o = (f'<rect width="{W}" height="{H}" rx="28" fill="{NOITE}"/>{niza_glows(W, H)}'
+         + bento_tile(P, P, pw, H - 2 * P, "LOJA NA SHOPEE", phone, 0)
+         + bento_tile(rx0, P, cal_w, th, "CALENDÁRIO DE CAMPANHAS", bento_calendario(cal_w, th), 1)
+         + bento_tile(rx0 + cal_w + G, P, rw - cal_w - G, th, "TRÁFEGO COM IA", bento_trafego(rw - cal_w - G, th), 2)
+         + bento_tile(rx0, P + th + G, sel_w, th, "EMBALAGEM", bento_selo(sel_w, th), 3)
+         + bento_tile(rx0 + sel_w + G, P + th + G, rw - sel_w - G, th, "NOTIFICAÇÕES", bento_avisos(rw - sel_w - G, th), 4)
+         + f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="28" fill="none" stroke="url(#nb)" stroke-width="2.5"/>')
+    tgs = "".join(f'<radialGradient id="tg{i}" cx="{cx}" cy="{cy}" r=".9"><stop offset="0" stop-color="{c}" stop-opacity=".28"/>'
+                  f'<stop offset="1" stop-color="{c}" stop-opacity="0"/></radialGradient>'
+                  for i, (c, cx, cy) in enumerate([(LILAS, .5, .9), (PITAYA, .1, .1), (SHOPEE, .9, .1), (PESSEGO, .5, .5), (LILAS, .9, .9)]))
+    defs = (tgs + phone_defs + NBLUR + niza_border()
+            + f'<linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{SHOPEE}" stop-opacity=".35"/><stop offset="1" stop-color="{SHOPEE}" stop-opacity="0"/></linearGradient>'
+            + f'<linearGradient id="scan" x1="0" x2="1"><stop offset="0" stop-color="{LILAS}" stop-opacity="0"/><stop offset="1" stop-color="{LILAS}" stop-opacity=".35"/></linearGradient>')
+    save("nizashop-bento.svg", svg(W, H, o, defs))
+
+
 def nizashop():
-    nizashop_hero(); nizashop_pilares(); nizashop_paleta(); nizashop_card(); nizashop_vitrine()
+    nizashop_hero(); nizashop_pilares(); nizashop_paleta(); nizashop_card(); nizashop_vitrine(); nizashop_bento()
 
 
 if __name__ == "__main__":

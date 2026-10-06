@@ -32,9 +32,7 @@
 <br><br>
 <a href="nizashop/"><img src="assets/nizashop-vitrine.svg" alt="Vitrine com os banners da NizaShop: boas-vindas, cupons, 10.10, 11.11, 12.12, Black Friday e Natal" width="100%"></a>
 <br><br>
-<a href="nizashop/"><img src="nizashop/assets/videos/campanha-11.11.webp" alt="Campanha 11.11 da NizaShop" width="32%"></a>
-<a href="nizashop/"><img src="nizashop/assets/videos/campanha-natal.webp" alt="Campanha de Natal da NizaShop" width="32%"></a>
-<a href="nizashop/"><img src="nizashop/assets/videos/campanha-ano-novo.webp" alt="Campanha de Ano Novo da NizaShop" width="32%"></a>
+<a href="nizashop/"><img src="assets/nizashop-bento.svg" alt="Painel da NizaShop: loja na Shopee no celular, calendário de campanhas, tráfego com IA, embalagem feita com carinho e notificações de pedidos" width="100%"></a>
 </div>
 
 <img src="assets/titulo-projetos.svg" alt="Projetos em destaque" width="100%">
