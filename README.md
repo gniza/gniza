@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/hero.svg" alt="Terminal do Claude Code apresentando Gabriel Niza, desenvolvedor web" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/hero-m.svg"><img src="assets/hero.svg" alt="Terminal do Claude Code apresentando Gabriel Niza, desenvolvedor web" width="100%"></picture>
 
 <br><br>
 
@@ -13,40 +13,40 @@
 
 </div>
 
-<img src="assets/titulo-sobre.svg" alt="Sobre mim" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/titulo-sobre-m.svg"><img src="assets/titulo-sobre.svg" alt="Sobre mim" width="100%"></picture>
 
 <div align="center">
-<img src="assets/claude-md.svg" alt="CLAUDE.md: Gabriel Niza, desenvolvedor web que cria sites e cardápios online para negócios locais" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/claude-md-m.svg"><img src="assets/claude-md.svg" alt="CLAUDE.md: Gabriel Niza, desenvolvedor web que cria sites e cardápios online para negócios locais" width="100%"></picture>
 </div>
 
-<img src="assets/titulo-stack.svg" alt="Ferramentas" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/titulo-stack-m.svg"><img src="assets/titulo-stack.svg" alt="Ferramentas" width="100%"></picture>
 
 <div align="center">
-<img src="assets/stack.svg" alt="Ferramenta principal: Claude Code. Secundárias: Gemini e ChatGPT. Design e marketing: TryBloom e especialista em tráfego com IA na Shopee. Outras ferramentas: HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Tailwind, Supabase, Vercel, Git e Figma" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/stack-m.svg"><img src="assets/stack.svg" alt="Ferramenta principal: Claude Code. Secundárias: Gemini e ChatGPT. Design e marketing: TryBloom e vendedor na Shopee. Outras ferramentas: HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Tailwind, Supabase, Vercel, Git e Figma" width="100%"></picture>
 </div>
 
-<img src="assets/titulo-nizashop.svg" alt="Minha loja" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/titulo-nizashop-m.svg"><img src="assets/titulo-nizashop.svg" alt="Minha loja" width="100%"></picture>
 
 <div align="center">
-<a href="nizashop/"><img src="assets/nizashop-destaque.svg" alt="NizaShop, loja na Shopee. Gabriel Niza, fundador e CEO. Loja criada com Claude, Gemini e TryBloom" width="100%"></a>
+<a href="nizashop/"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/nizashop-destaque-m.svg"><img src="assets/nizashop-destaque.svg" alt="NizaShop, loja na Shopee. Gabriel Niza, fundador e CEO. Loja criada com Claude, Gemini e TryBloom" width="100%"></picture></a>
 <br><br>
-<a href="nizashop/"><img src="assets/nizashop-deck.svg" alt="Apresentação institucional da NizaShop: missão, proposta de valor, crescimento com IA e próximos passos, assinada por Gabriel Niza, fundador e CEO" width="100%"></a>
+<a href="nizashop/"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/nizashop-deck-m.svg"><img src="assets/nizashop-deck.svg" alt="Apresentação institucional da NizaShop: missão, proposta de valor, crescimento com IA e próximos passos, assinada por Gabriel Niza, fundador e CEO" width="100%"></picture></a>
 <br><br>
-<a href="nizashop/"><img src="assets/nizashop-bento.svg" alt="Painel da NizaShop: loja na Shopee no celular, calendário de campanhas, tráfego com IA, cupons da loja e notificações de pedidos" width="100%"></a>
+<a href="nizashop/"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/nizashop-bento-m.svg"><img src="assets/nizashop-bento.svg" alt="Painel da NizaShop: loja na Shopee no celular, calendário de campanhas, vendedor na Shopee, cupons da loja e notificações de pedidos" width="100%"></picture></a>
 </div>
 
-<img src="assets/titulo-projetos.svg" alt="Projetos em destaque" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/titulo-projetos-m.svg"><img src="assets/titulo-projetos.svg" alt="Projetos em destaque" width="100%"></picture>
 
 <div align="center">
-<a href="https://github.com/gniza/agrovic-site"><img src="assets/projeto-agrovic-site.svg" alt="agrovic-site" width="49%"></a>
-<a href="https://github.com/gniza/costelao-pedidos"><img src="assets/projeto-costelao-pedidos.svg" alt="costelao-pedidos" width="49%"></a>
-<a href="https://github.com/gniza/studiohairhousebarber"><img src="assets/projeto-studiohairhousebarber.svg" alt="studiohairhousebarber" width="49%"></a>
-<a href="https://github.com/gniza/DomBoscoPage"><img src="assets/projeto-DomBoscoPage.svg" alt="DomBoscoPage" width="49%"></a>
-<a href="https://github.com/gniza/SitePontoPet"><img src="assets/projeto-SitePontoPet.svg" alt="SitePontoPet" width="49%"></a>
-<a href="https://github.com/gniza/AtakamaGastrobar"><img src="assets/projeto-AtakamaGastrobar.svg" alt="AtakamaGastrobar" width="49%"></a>
+<a href="https://github.com/gniza/agrovic-site"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/projeto-agrovic-site-m.svg"><img src="assets/projeto-agrovic-site.svg" alt="agrovic-site" width="49%"></picture></a>
+<a href="https://github.com/gniza/costelao-pedidos"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/projeto-costelao-pedidos-m.svg"><img src="assets/projeto-costelao-pedidos.svg" alt="costelao-pedidos" width="49%"></picture></a>
+<a href="https://github.com/gniza/studiohairhousebarber"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/projeto-studiohairhousebarber-m.svg"><img src="assets/projeto-studiohairhousebarber.svg" alt="studiohairhousebarber" width="49%"></picture></a>
+<a href="https://github.com/gniza/DomBoscoPage"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/projeto-DomBoscoPage-m.svg"><img src="assets/projeto-DomBoscoPage.svg" alt="DomBoscoPage" width="49%"></picture></a>
+<a href="https://github.com/gniza/SitePontoPet"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/projeto-SitePontoPet-m.svg"><img src="assets/projeto-SitePontoPet.svg" alt="SitePontoPet" width="49%"></picture></a>
+<a href="https://github.com/gniza/AtakamaGastrobar"><picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/projeto-AtakamaGastrobar-m.svg"><img src="assets/projeto-AtakamaGastrobar.svg" alt="AtakamaGastrobar" width="49%"></picture></a>
 </div>
 
-<img src="assets/titulo-contrib.svg" alt="Contribuições" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/titulo-contrib-m.svg"><img src="assets/titulo-contrib.svg" alt="Contribuições" width="100%"></picture>
 
 <div align="center">
 <picture>
@@ -56,7 +56,7 @@
 </picture>
 </div>
 
-<img src="assets/titulo-contato.svg" alt="Vamos conversar?" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/assets/titulo-contato-m.svg"><img src="assets/titulo-contato.svg" alt="Vamos conversar?" width="100%"></picture>
 
 <div align="center">
 

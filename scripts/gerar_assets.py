@@ -39,6 +39,14 @@ def save(name, body):
     (OUT / name).write_text(body, encoding="utf-8")
 
 
+W_MOBILE = 420  # largura das versões para celular (*-m.svg)
+
+
+def mname(name, mobile):
+    """'hero.svg' -> 'hero-m.svg' na versão para celular."""
+    return name.replace(".svg", "-m.svg") if mobile else name
+
+
 def svg(w, h, inner, defs=""):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
             f'viewBox="0 0 {w} {h}"><defs>{defs}</defs>{inner}</svg>')
@@ -134,6 +142,7 @@ def stars(w, h, n, y0=60):
 # CONTEÚDO
 HERO_NAME = "Gabriel Niza"
 HERO_SUB = "desenvolvedor web · front-end · vibe coding com Claude"
+HERO_SUB_M = ("desenvolvedor web · front-end", "vibe coding com Claude")  # versão celular
 PERGUNTA = "> me conta sobre o Gabriel"
 RESPOSTAS = [
     ("●", "Desenvolvedor web apaixonado por front-end"),
@@ -144,39 +153,60 @@ RESPOSTAS = [
 STATUS = "✔ Disponível para novos projetos"
 
 
-def hero():
-    W, H, T = 1200, 580, 18.0
-    CW = 10.3  # largura de um caractere (17px mono)
-    y0, dy = 350, 32
-    o = frame(W, H) + stars(W, H, 30) + window_chrome(W, "gniza — claude — ~/github/gniza")
+def hero(mobile=False):
+    T = 18.0
+    if mobile:
+        W, fs, CW, wrap_n = W_MOBILE, 14.5, 8.8, 32
+        box, welcome, name_xy, name_fs = (24, 76, W_MOBILE - 48, 236), (44, 110, 14), (42, 172, 46), 46
+        subs, sub_fs, help_line = [(44, 210, HERO_SUB_M[0]), (44, 232, HERO_SUB_M[1])], 14, None
+        spark_xyz, mascot = (352, 126, .34), (292, 250, 5)
+        y0, dy, x0 = 350, 26, 32
+    else:
+        W, fs, CW, wrap_n = 1200, 17, 10.3, None
+        box, welcome, name_xy, name_fs = (40, 82, 1120, 216), (72, 122, 16), (70, 198, 70), 70
+        subs, sub_fs, help_line = [(72, 240, HERO_SUB)], 17, (72, 274)
+        spark_xyz, mascot = (1062, 168, .72), (860, 170, 9)
+        y0, dy, x0 = 350, 32, 50
 
-    # caixa de boas-vindas
-    o += f'<rect x="40" y="82" width="{W-80}" height="216" rx="14" fill="{PANEL}" stroke="{OR}" stroke-opacity=".75" stroke-width="1.5"/>'
-    o += f'<text x="72" y="122" {MONO} font-size="16" fill="{OR}">✻ Bem-vindo ao Claude Code</text>'
-    o += (f'<text x="70" y="198" {SERIF} font-size="70" fill="{CREAM}" letter-spacing="-1">{esc(HERO_NAME)}'
+    # linhas da conversa (no celular as respostas longas quebram em duas)
+    resp_lines = []
+    for b, txt in RESPOSTAS:
+        parts = textwrap.wrap(txt, wrap_n) if wrap_n else [txt]
+        resp_lines.append([(b if j == 0 else " ", p) for j, p in enumerate(parts)])
+    n_resp = sum(len(r) for r in resp_lines)
+    H = y0 + dy * (n_resp + 2) + (40 if mobile else 54)
+
+    o = frame(W, H) + stars(W, H, 18 if mobile else 30) + window_chrome(W, "gniza — claude" if mobile else "gniza — claude — ~/github/gniza")
+    bx, by, bw, bh = box
+    o += f'<rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="14" fill="{PANEL}" stroke="{OR}" stroke-opacity=".75" stroke-width="1.5"/>'
+    o += f'<text x="{welcome[0]}" y="{welcome[1]}" {MONO} font-size="{welcome[2]}" fill="{OR}">✻ Bem-vindo ao Claude Code</text>'
+    o += (f'<text x="{name_xy[0]}" y="{name_xy[1]}" {SERIF} font-size="{name_fs}" fill="{CREAM}" letter-spacing="-1">{esc(HERO_NAME)}'
           f'{reveal(.2, .8)}</text>')
-    o += f'<text x="72" y="240" {MONO} font-size="17" fill="{MUTED}">{esc(HERO_SUB)}</text>'
-    o += f'<text x="72" y="274" {MONO} font-size="14" fill="{DIM}">/help para ajuda · /status para ver a configuração</text>'
-    o += f'<g filter="url(#glow)">{spark(1062, 168, .72)}</g>'
-    o += (f'<g transform="translate(860,170)">{bob(clawd(9), 8)}'
-          f'<ellipse cx="63" cy="84" rx="52" ry="5" fill="#000" opacity=".35">'
-          f'<animate attributeName="rx" values="52;42;52" dur=".9s" repeatCount="indefinite"/></ellipse></g>')
+    for x, y, t in subs:
+        o += f'<text x="{x}" y="{y}" {MONO} font-size="{sub_fs}" fill="{MUTED}">{esc(t)}</text>'
+    if help_line:
+        o += f'<text x="{help_line[0]}" y="{help_line[1]}" {MONO} font-size="14" fill="{DIM}">/help para ajuda · /status para ver a configuração</text>'
+    o += f'<g filter="url(#glow)">{spark(*spark_xyz)}</g>'
+    mx, my, mu = mascot
+    o += (f'<g transform="translate({mx},{my})">{bob(clawd(mu), mu - 1)}'
+          f'<ellipse cx="{7*mu}" cy="{9.3*mu:.0f}" rx="{5.8*mu:.0f}" ry="{mu*.55:.1f}" fill="#000" opacity=".35">'
+          f'<animate attributeName="rx" values="{5.8*mu:.0f};{4.7*mu:.0f};{5.8*mu:.0f}" dur=".9s" repeatCount="indefinite"/></ellipse></g>')
 
     # pergunta digitada
     n = len(PERGUNTA)
     w = n * CW + 6
-    s, d = .6, 1.6
+    s0, d = .6, 1.6
     times, vals = [0], [0]
     for k in range(1, n + 1):
-        times.append(s + (k - 1) * d / n)
+        times.append(s0 + (k - 1) * d / n)
         vals.append(round(w * k / n, 1))
     times += [16.6, T]
     vals += [0, 0]
     kt = ";".join(f"{t/T:.4f}" for t in times[:-1]) + ";1"
-    o += (f'<clipPath id="q"><rect x="50" y="{y0-22}" height="30" width="{w:.0f}">'
+    o += (f'<clipPath id="q"><rect x="{x0}" y="{y0-22}" height="30" width="{w:.0f}">'
           f'<animate attributeName="width" calcMode="discrete" dur="{T}s" repeatCount="indefinite" '
           f'keyTimes="{kt}" values="{";".join(map(str, vals))}"/></rect></clipPath>')
-    o += (f'<text x="50" y="{y0}" {MONO} font-size="17" fill="{CREAM}" clip-path="url(#q)">'
+    o += (f'<text x="{x0}" y="{y0}" {MONO} font-size="{fs}" fill="{CREAM}" clip-path="url(#q)">'
           f'<tspan fill="{DIM}">&gt;</tspan>{esc(PERGUNTA[1:])}</text>')
 
     def window(a, b, base=1):
@@ -186,38 +216,35 @@ def hero():
 
     # spinner "pensando"
     ys = y0 + dy
-    glyphs = "·✢✳✶✻✽"
     spin = ""
-    for k, gch in enumerate(glyphs):
+    for k, gch in enumerate("·✢✳✶✻✽"):
         a, b = k / 6, (k + 1) / 6
-        if k == 0:
-            anim = f'values="1;0;0" keyTimes="0;{b:.4f};1"'
-        else:
-            anim = f'values="0;1;0;0" keyTimes="0;{a:.4f};{b:.4f};1"'
-        spin += (f'<text x="50" y="{ys}" {MONO} font-size="17" fill="{OR}" opacity="0">{gch}'
-                 f'<animate attributeName="opacity" calcMode="discrete" dur=".9s" repeatCount="indefinite" {anim}/></text>')
+        ka = f'values="1;0;0" keyTimes="0;{b:.4f};1"' if k == 0 else f'values="0;1;0;0" keyTimes="0;{a:.4f};{b:.4f};1"'
+        spin += (f'<text x="{x0}" y="{ys}" {MONO} font-size="{fs}" fill="{OR}" opacity="0">{gch}'
+                 f'<animate attributeName="opacity" calcMode="discrete" dur=".9s" repeatCount="indefinite" {ka}/></text>')
     o += (f'<linearGradient id="sh" gradientUnits="userSpaceOnUse" x1="0" x2="160" y1="0" y2="0">'
           f'<stop offset="0" stop-color="{OR}"/><stop offset=".5" stop-color="{MANILLA}"/><stop offset="1" stop-color="{OR}"/>'
           f'<animateTransform attributeName="gradientTransform" type="translate" from="-80 0" to="200 0" dur="1.2s" repeatCount="indefinite"/></linearGradient>')
     o += (f'<g {window(2.4, 3.9, 0)}{spin}'
-          f'<text x="72" y="{ys}" {MONO} font-size="17" fill="url(#sh)">Pensando…</text></g>')
+          f'<text x="{x0 + 2*CW:.0f}" y="{ys}" {MONO} font-size="{fs}" fill="url(#sh)">Pensando…</text></g>')
 
     # respostas
-    t = 4.2
-    for i, (b, txt) in enumerate(RESPOSTAS):
-        y = ys + i * dy
-        o += (f'<g {window(t, 16.4)}<text x="50" y="{y}" {MONO} font-size="17" fill="{CREAM}">'
-              f'<tspan fill="{OR}">{b}</tspan> {esc(txt)}</text></g>')
+    t, y = 4.2, ys
+    for lines in resp_lines:
+        g = ""
+        for b, txt in lines:
+            g += (f'<text x="{x0}" y="{y}" {MONO} font-size="{fs}" fill="{CREAM}" xml:space="preserve">'
+                  f'<tspan fill="{OR}">{b}</tspan> {esc(txt)}</text>')
+            y += dy
+        o += f'<g {window(t, 16.4)}{g}</g>'
         t += .7
-    y = ys + len(RESPOSTAS) * dy
-    o += (f'<g {window(t + .3, 16.4)}<text x="50" y="{y}" {MONO} font-size="17" fill="{GREEN}">'
+    o += (f'<g {window(t + .3, 16.4)}<text x="{x0}" y="{y}" {MONO} font-size="{fs}" fill="{GREEN}">'
           f'{esc(STATUS)}</text></g>')
-    # prompt final
     y += dy + 6
-    o += (f'<g {window(t + 1, 16.4)}<text x="50" y="{y}" {MONO} font-size="17" fill="{OR}">&gt;</text>'
-          f'<rect x="68" y="{y-15}" width="10" height="20" fill="{OR}">'
+    o += (f'<g {window(t + 1, 16.4)}<text x="{x0}" y="{y}" {MONO} font-size="{fs}" fill="{OR}">&gt;</text>'
+          f'<rect x="{x0 + 18}" y="{y-15}" width="{fs*.6:.0f}" height="{fs+3:.0f}" fill="{OR}">'
           f'<animate attributeName="opacity" dur="1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;.5;.5;1"/></rect></g>')
-    save("hero.svg", svg(W, H, o, border_gradient("bd") + GLOW))
+    save(mname("hero.svg", mobile), svg(W, H, o, border_gradient("bd") + GLOW))
 
 
 # ======================================================= 2. títulos de seção
@@ -231,17 +258,18 @@ TITULOS = {
 }
 
 
-def titles():
+def titles(mobile=False):
+    W, H = (W_MOBILE, 70) if mobile else (900, 70)
     for key, txt in TITULOS.items():
-        W, H = 900, 70
         o = spark(30, 36, .32, 14, 10)
         o += f'<text x="70" y="47" {SERIF} font-size="34" fill="{OR}">{esc(txt)}</text>'
         x0 = 70 + len(txt) * 17 + 24
-        o += (f'<line x1="{x0}" y1="38" x2="{x0}" y2="38" stroke="url(#ln)" stroke-width="2" stroke-linecap="round">'
-              f'<animate attributeName="x2" values="{x0};{W-10};{W-10}" keyTimes="0;.4;1" dur="4s" repeatCount="indefinite"/></line>')
+        if x0 < W - 30:
+            o += (f'<line x1="{x0}" y1="38" x2="{x0}" y2="38" stroke="url(#ln)" stroke-width="2" stroke-linecap="round">'
+                  f'<animate attributeName="x2" values="{x0};{W-10};{W-10}" keyTimes="0;.4;1" dur="4s" repeatCount="indefinite"/></line>')
         defs = (f'<linearGradient id="ln" x1="0" x2="1"><stop offset="0" stop-color="{OR}"/>'
                 f'<stop offset="1" stop-color="{OR}" stop-opacity="0"/></linearGradient>')
-        save(f"titulo-{key}.svg", svg(W, H, o, defs))
+        save(mname(f"titulo-{key}.svg", mobile), svg(W, H, o, defs))
 
 
 # ======================================================= 3. CLAUDE.md
@@ -265,21 +293,34 @@ CLAUDE_MD = [
 ]
 
 
-def claude_md():
-    W = 1200
-    lh, top = 28, 112
-    H = top + len(CLAUDE_MD) * lh + 40
+def claude_md(mobile=False):
+    if mobile:
+        W, fs, cw, lh, top, gut, tx, wrap_n = W_MOBILE, 15, 9.05, 24, 106, 44, 54, 34
+    else:
+        W, fs, cw, lh, top, gut, tx, wrap_n = 1200, 18, 10.85, 28, 112, 78, 98, None
+    # linhas visuais: (número ou None, tipo, texto)
+    rows = []
+    for i, (kind, txt) in enumerate(CLAUDE_MD):
+        if wrap_n and kind in ("li", "quote") and len(txt) > wrap_n:
+            body = txt[1:].strip() if kind == "quote" else txt
+            parts = textwrap.wrap(body, wrap_n - 2)
+            rows.append((i + 1, kind, ("> " + parts[0]) if kind == "quote" else parts[0]))
+            rows += [(None, kind + "+", p) for p in parts[1:]]
+        else:
+            rows.append((i + 1, kind, txt))
+    H = top + len(rows) * lh + 40
     o = frame(W, H) + window_chrome(W, "~/github/gniza")
-    # abas
     o += f'<rect x="10" y="58" width="{W-20}" height="36" fill="{PANEL}"/>'
     o += f'<rect x="10" y="58" width="170" height="36" fill="{BG}"/><rect x="10" y="58" width="170" height="2" fill="{OR}"/>'
     o += f'<text x="34" y="81" {MONO} font-size="14" fill="{CREAM}"><tspan fill="{OR}">✻</tspan> CLAUDE.md</text>'
     o += f'<text x="208" y="81" {MONO} font-size="14" fill="{DIM}">README.md</text>'
-    o += f'<text x="340" y="81" {MONO} font-size="14" fill="{DIM}">index.html</text>'
-    o += f'<line x1="78" y1="100" x2="78" y2="{H-24}" stroke="{BORDER}"/>'
-    for i, (kind, txt) in enumerate(CLAUDE_MD):
-        y = top + i * lh + 12
-        o += f'<text x="58" y="{y}" text-anchor="end" {MONO} font-size="15" fill="{DIM}">{i+1}</text>'
+    if not mobile:
+        o += f'<text x="340" y="81" {MONO} font-size="14" fill="{DIM}">index.html</text>'
+    o += f'<line x1="{gut}" y1="100" x2="{gut}" y2="{H-24}" stroke="{BORDER}"/>'
+    for r, (num, kind, txt) in enumerate(rows):
+        y = top + r * lh + 12
+        if num:
+            o += f'<text x="{gut - 20}" y="{y}" text-anchor="end" {MONO} font-size="{fs - 3}" fill="{DIM}">{num}</text>'
         if kind == "blank":
             continue
         if kind == "h1":
@@ -288,18 +329,21 @@ def claude_md():
             line = f'<tspan fill="{DIM}">##</tspan><tspan fill="{KRAFT}" font-weight="700">{esc(txt[2:])}</tspan>'
         elif kind == "quote":
             line = f'<tspan fill="{DIM}">&gt;</tspan><tspan fill="{MUTED}" font-style="italic">{esc(txt[1:])}</tspan>'
+        elif kind == "quote+":
+            line = f'<tspan fill="{MUTED}" font-style="italic">  {esc(txt)}</tspan>'
+        elif kind == "li+":
+            line = f'<tspan fill="{CREAM}">  {esc(txt)}</tspan>'
         else:
             line = f'<tspan fill="{OR}">-</tspan> <tspan fill="{CREAM}">{esc(txt)}</tspan>'
-        o += f'<text x="98" y="{y}" {MONO} font-size="18">{line}{reveal(.3 + i * .18, .35)}</text>'
-    # cursor no fim
-    last = top + (len(CLAUDE_MD) - 1) * lh + 12
-    cx = 98 + (len(CLAUDE_MD[-1][1]) + 2) * 10.85
-    o += (f'<rect x="{cx:.0f}" y="{last-16}" width="3" height="21" fill="{OR}" opacity="0">'
-          f'<animate attributeName="opacity" begin="{.3 + len(CLAUDE_MD)*.18:.1f}s" dur="1s" repeatCount="indefinite" '
+        o += f'<text x="{tx}" y="{y}" {MONO} font-size="{fs}" xml:space="preserve">{line}{reveal(.3 + r * .16, .35)}</text>'
+    last = top + (len(rows) - 1) * lh + 12
+    cx = tx + (len(rows[-1][2]) + 2) * cw
+    o += (f'<rect x="{cx:.0f}" y="{last-fs+2}" width="3" height="{fs+3}" fill="{OR}" opacity="0">'
+          f'<animate attributeName="opacity" begin="{.3 + len(rows)*.16:.1f}s" dur="1s" repeatCount="indefinite" '
           f'values="1;1;0;0" keyTimes="0;.5;.5;1"/></rect>')
-    # mascote espiando no canto
-    o += f'<g transform="translate({W-190},{H-118})">{bob(clawd(9), 5, 1.4)}</g>'
-    save("claude-md.svg", svg(W, H, o, border_gradient("bd", 10)))
+    if not mobile:
+        o += f'<g transform="translate({W-190},{H-118})">{bob(clawd(9), 5, 1.4)}</g>'
+    save(mname("claude-md.svg", mobile), svg(W, H, o, border_gradient("bd", 10)))
 
 
 # ======================================================= 4. ferramentas
@@ -321,7 +365,7 @@ SECUNDARIAS = [
 ]
 DESIGN_MARKETING = [
     ("TryBloom", "design de marca com IA", "#9d4edd", "trybloom", "DESIGN", "#c08cf0"),
-    ("Shopee", "especialista em tráfego com IA", "#ee4d2d", "shopee", "ESPECIALIDADE", "#ff7a5c"),
+    ("Shopee", "Vendedor na Shopee", "#ee4d2d", "shopee", "VENDEDOR", "#ff7a5c"),
 ]
 
 
@@ -357,31 +401,30 @@ def tool_icon(icon, col):
     raise ValueError(icon)
 
 
-def tool_card(sw, sh, name, sub, col, icon, badge, badge_col):
+def tool_card(sw, sh, name, sub, col, icon, badge, badge_col, compact=False):
+    """Card médio de ferramenta. compact=True (celular) põe o selo no canto superior direito."""
     o = (f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{PANEL}" stroke="{col}" stroke-opacity=".55" stroke-width="1.5"/>'
          f'<rect width="{sw:.0f}" height="{sh}" rx="16" fill="{col}" opacity=".06"/>')
-    if icon == "shopee":
-        # gráfico de tráfego subindo ao fundo
-        pts = [(290, 86), (320, 78), (345, 82), (372, 64), (398, 68), (425, 46), (450, 52), (480, 28), (sw - 16, 14)]
-        line = " ".join(f"{x:.0f},{y}" for x, y in pts)
-        area = f"M290 {sh-6} L" + " L".join(f"{x:.0f} {y}" for x, y in pts) + f" L{sw-16:.0f} {sh-6} Z"
-        o += (f'<path d="{area}" fill="{col}" opacity=".10"/>'
-              f'<polyline points="{line}" fill="none" stroke="{col}" stroke-width="2.5" stroke-linejoin="round" '
-              f'stroke-linecap="round" opacity=".55" stroke-dasharray="360" stroke-dashoffset="360">'
-              f'<animate attributeName="stroke-dashoffset" values="360;0;0;360" keyTimes="0;.45;.85;1" dur="5s" repeatCount="indefinite"/></polyline>')
     bw = len(badge) * 8.4 + 30
+    by = 12 if compact else sh / 2 - 14
+    bh = 24 if compact else 28
     o += (f'<g transform="translate(52,{sh/2})">{tool_icon(icon, col)}</g>'
-          f'<text x="96" y="{sh/2 - 4}" {SERIF} font-size="30" fill="{CREAM}">{esc(name)}</text>'
+          f'<text x="96" y="{sh/2 - 4}" {SERIF} font-size="{27 if compact else 30}" fill="{CREAM}">{esc(name)}</text>'
           f'<text x="98" y="{sh/2 + 22}" {MONO} font-size="14" fill="{MUTED}">{esc(sub)}</text>'
-          f'<rect x="{sw - bw - 26:.0f}" y="{sh/2 - 14}" width="{bw:.0f}" height="28" rx="14" fill="{PANEL}" stroke="{badge_col}" stroke-opacity=".7"/>'
-          f'<text x="{sw - bw/2 - 26:.0f}" y="{sh/2 + 5}" text-anchor="middle" {MONO} font-size="12" font-weight="700" '
+          f'<rect x="{sw - bw - (14 if compact else 26):.0f}" y="{by:.0f}" width="{bw:.0f}" height="{bh}" rx="{bh/2:.0f}" fill="{PANEL}" stroke="{badge_col}" stroke-opacity=".7"/>'
+          f'<text x="{sw - bw/2 - (14 if compact else 26):.0f}" y="{by + bh/2 + 4:.0f}" text-anchor="middle" {MONO} font-size="{11 if compact else 12}" font-weight="700" '
           f'fill="{badge_col}" letter-spacing="1.2">{esc(badge)}</text>')
     return o
 
 
-def stack():
-    W, cols, cw, ch, gx, gy = 1200, 6, 168, 64, 20, 22
-    fx, fy, fw, fh = 45, 84, W - 90, 244
+def stack(mobile=False):
+    if mobile:
+        W, cols, ch, gx, gy = W_MOBILE, 2, 54, 14, 14
+        fx, fy, fw, fh = 16, 76, W_MOBILE - 32, 330
+    else:
+        W, cols, ch, gx, gy = 1200, 6, 64, 20, 22
+        fx, fy, fw, fh = 45, 84, 1110, 244
+    cw = (fw - (cols - 1) * gx) / cols if mobile else 168
     o = window_chrome(W, "/stack")
 
     # ---------- card principal ----------
@@ -390,16 +433,36 @@ def stack():
     o += f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="20" fill="{PANEL}"/>'
     o += f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="20" fill="url(#rg)"/>'
     o += f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="20" fill="none" stroke="url(#bd2)" stroke-width="2.5"/>'
-    o += f'<g filter="url(#glow)">{spark(fx + 112, fy + fh / 2, 1.05, 18)}</g>'
-    tx = fx + 222
-    o += (f'<rect x="{tx}" y="{fy + 24}" width="232" height="28" rx="14" fill="{OR}" fill-opacity=".15" stroke="{OR}" stroke-opacity=".7"/>'
-          f'<text x="{tx + 116}" y="{fy + 43}" text-anchor="middle" {MONO} font-size="13" font-weight="700" fill="{OR}" letter-spacing="1.5">'
-          f'★ FERRAMENTA PRINCIPAL<animate attributeName="opacity" values="1;.55;1" dur="2s" repeatCount="indefinite"/></text>')
-    o += f'<text x="{tx - 2}" y="{fy + 104}" {SERIF} font-size="58" fill="{CREAM}" letter-spacing="-1">{esc(PRINCIPAL)}</text>'
-    o += f'<text x="{tx}" y="{fy + 138}" {MONO} font-size="17" fill="{MUTED}">{esc(PRINCIPAL_SUB)}</text>'
+    if mobile:
+        o += f'<g filter="url(#glow)">{spark(fx + 96, fy + 78, .55, 18)}</g>'
+        mx, my, mu = fx + fw - 150, fy + 44, 7
+        o += (f'<g transform="translate({mx},{my})">{bob(clawd(mu), 6)}'
+              f'<ellipse cx="{7*mu}" cy="{9.4*mu:.0f}" rx="{5.8*mu:.0f}" ry="4" fill="#000" opacity=".35"/></g>')
+        cx = fx + fw / 2
+        o += (f'<rect x="{cx - 116}" y="{fy + 150}" width="232" height="28" rx="14" fill="{OR}" fill-opacity=".15" stroke="{OR}" stroke-opacity=".7"/>'
+              f'<text x="{cx}" y="{fy + 169}" text-anchor="middle" {MONO} font-size="13" font-weight="700" fill="{OR}" letter-spacing="1.5">'
+              f'★ FERRAMENTA PRINCIPAL<animate attributeName="opacity" values="1;.55;1" dur="2s" repeatCount="indefinite"/></text>')
+        o += f'<text x="{cx}" y="{fy + 226}" text-anchor="middle" {SERIF} font-size="46" fill="{CREAM}" letter-spacing="-1">{esc(PRINCIPAL)}</text>'
+        o += f'<text x="{cx}" y="{fy + 254}" text-anchor="middle" {MONO} font-size="13.5" fill="{MUTED}">{esc(PRINCIPAL_SUB)}</text>'
+        cmd_fs, cmd_cw = 13.5, 8.2
+        w = len(PRINCIPAL_CMD) * cmd_cw + 6
+        tx = cx - (w + 72) / 2
+        cy, my2 = fy + 286, fy + 306
+        bar_x, bar_w = fx + 112, fw - 190
+    else:
+        o += f'<g filter="url(#glow)">{spark(fx + 112, fy + fh / 2, 1.05, 18)}</g>'
+        tx = fx + 222
+        o += (f'<rect x="{tx}" y="{fy + 24}" width="232" height="28" rx="14" fill="{OR}" fill-opacity=".15" stroke="{OR}" stroke-opacity=".7"/>'
+              f'<text x="{tx + 116}" y="{fy + 43}" text-anchor="middle" {MONO} font-size="13" font-weight="700" fill="{OR}" letter-spacing="1.5">'
+              f'★ FERRAMENTA PRINCIPAL<animate attributeName="opacity" values="1;.55;1" dur="2s" repeatCount="indefinite"/></text>')
+        o += f'<text x="{tx - 2}" y="{fy + 104}" {SERIF} font-size="58" fill="{CREAM}" letter-spacing="-1">{esc(PRINCIPAL)}</text>'
+        o += f'<text x="{tx}" y="{fy + 138}" {MONO} font-size="17" fill="{MUTED}">{esc(PRINCIPAL_SUB)}</text>'
+        cmd_fs, cmd_cw = 16, 9.7
+        w = len(PRINCIPAL_CMD) * cmd_cw + 6
+        cy, my2 = fy + 180, fy + 206
+        bar_x, bar_w = tx + 100, 300
     # comando digitado em loop
     T, n = 8.0, len(PRINCIPAL_CMD)
-    w = n * 9.7 + 6
     times, vals = [0], [0]
     for k in range(1, n + 1):
         times.append(.4 + (k - 1) * 2.2 / n)
@@ -407,40 +470,42 @@ def stack():
     times += [7.4, T]
     vals += [0, 0]
     kt = ";".join(f"{t/T:.4f}" for t in times[:-1]) + ";1"
-    cy = fy + 180
-    o += (f'<clipPath id="cmd"><rect x="{tx}" y="{cy - 20}" height="28" width="{w:.0f}">'
+    o += (f'<clipPath id="cmd"><rect x="{tx:.0f}" y="{cy - 20}" height="28" width="{w:.0f}">'
           f'<animate attributeName="width" calcMode="discrete" dur="{T}s" repeatCount="indefinite" '
           f'keyTimes="{kt}" values="{";".join(map(str, vals))}"/></rect></clipPath>')
-    o += (f'<text x="{tx}" y="{cy}" {MONO} font-size="16" fill="{CREAM}" clip-path="url(#cmd)" xml:space="preserve">'
+    o += (f'<text x="{tx:.0f}" y="{cy}" {MONO} font-size="{cmd_fs}" fill="{CREAM}" clip-path="url(#cmd)" xml:space="preserve">'
           f'<tspan fill="{OR}">&gt;</tspan>{esc(PRINCIPAL_CMD[1:])}</text>')
-    o += (f'<text x="{tx + w + 14:.0f}" y="{cy}" {MONO} font-size="16" fill="{GREEN}">✔ feito'
+    o += (f'<text x="{tx + w + 12:.0f}" y="{cy}" {MONO} font-size="{cmd_fs}" fill="{GREEN}">✔ feito'
           f'<animate attributeName="opacity" dur="{T}s" repeatCount="indefinite" keyTimes="0;{3/T:.3f};{3.2/T:.3f};{7.3/T:.3f};{7.4/T:.3f};1" values="0;0;1;1;0;0"/></text>')
     # medidor de uso
-    my = fy + 206
-    o += f'<text x="{tx}" y="{my + 11}" {MONO} font-size="13" fill="{DIM}">uso diário</text>'
-    o += f'<rect x="{tx + 100}" y="{my}" width="300" height="12" rx="6" fill="{BG}" stroke="{BORDER}"/>'
-    o += (f'<rect x="{tx + 100}" y="{my}" width="300" height="12" rx="6" fill="url(#bar)">'
-          f'<animate attributeName="width" values="0;300;300" keyTimes="0;.35;1" dur="{T}s" repeatCount="indefinite"/></rect>')
-    o += f'<text x="{tx + 414}" y="{my + 11}" {MONO} font-size="13" font-weight="700" fill="{OR}">100%</text>'
-    # mascote
-    mx = fx + fw - 210
-    o += (f'<g transform="translate({mx},{fy + 66})">{bob(clawd(10), 9)}'
-          f'<ellipse cx="70" cy="96" rx="58" ry="5" fill="#000" opacity=".35">'
-          f'<animate attributeName="rx" values="58;46;58" dur=".9s" repeatCount="indefinite"/></ellipse></g>')
-    for k, (dx, dy, fs) in enumerate(((-26, 40, 18), (166, 30, 14), (150, 140, 12), (-10, 150, 13))):
-        o += (f'<text x="{mx + dx}" y="{fy + dy}" {MONO} font-size="{fs}" fill="{OR}">✻'
-              f'<animate attributeName="opacity" values="0;1;0" dur="2.2s" begin="{-k*.55:.2f}s" repeatCount="indefinite"/></text>')
+    lx = fx + 24 if mobile else tx
+    o += f'<text x="{lx:.0f}" y="{my2 + 11}" {MONO} font-size="13" fill="{DIM}">uso diário</text>'
+    o += f'<rect x="{bar_x:.0f}" y="{my2}" width="{bar_w}" height="12" rx="6" fill="{BG}" stroke="{BORDER}"/>'
+    o += (f'<rect x="{bar_x:.0f}" y="{my2}" width="{bar_w}" height="12" rx="6" fill="url(#bar)">'
+          f'<animate attributeName="width" values="0;{bar_w};{bar_w}" keyTimes="0;.35;1" dur="{T}s" repeatCount="indefinite"/></rect>')
+    o += f'<text x="{bar_x + bar_w + 14:.0f}" y="{my2 + 11}" {MONO} font-size="13" font-weight="700" fill="{OR}">100%</text>'
+    if not mobile:
+        mx = fx + fw - 210
+        o += (f'<g transform="translate({mx},{fy + 66})">{bob(clawd(10), 9)}'
+              f'<ellipse cx="70" cy="96" rx="58" ry="5" fill="#000" opacity=".35">'
+              f'<animate attributeName="rx" values="58;46;58" dur=".9s" repeatCount="indefinite"/></ellipse></g>')
+        for k, (dx, dy, fs) in enumerate(((-26, 40, 18), (166, 30, 14), (150, 140, 12), (-10, 150, 13))):
+            o += (f'<text x="{mx + dx}" y="{fy + dy}" {MONO} font-size="{fs}" fill="{OR}">✻'
+                  f'<animate attributeName="opacity" values="0;1;0" dur="2.2s" begin="{-k*.55:.2f}s" repeatCount="indefinite"/></text>')
 
     # ---------- secundárias e design & marketing ----------
-    sh, sg = 96, 20
-    sw = (fw - sg) / 2
+    sh, sg = (84, 14) if mobile else (96, 20)
+    sw = fw if mobile else (fw - sg) / 2
     ly = fy + fh + 44
     for label, cards in (("└ ferramentas secundárias", SECUNDARIAS), ("└ design & marketing", DESIGN_MARKETING)):
         o += f'<text x="{fx}" y="{ly}" {MONO} font-size="14" fill="{DIM}">{esc(label)}</text>'
         for i, card_data in enumerate(cards):
-            x, y = fx + i * (sw + sg), ly + 20
-            o += f'<g transform="translate({x:.0f},{y})">{bob(tool_card(sw, sh, *card_data), 3, 2.6 + i * .5)}</g>'
-        ly += 20 + sh + 44
+            if mobile:
+                x, y = fx, ly + 20 + i * (sh + sg)
+            else:
+                x, y = fx + i * (sw + sg), ly + 20
+            o += f'<g transform="translate({x:.0f},{y})">{bob(tool_card(sw, sh, *card_data, compact=mobile), 3, 2.6 + i * .5)}</g>'
+        ly += 20 + (len(cards) * (sh + sg) - sg if mobile else sh) + 44
 
     # ---------- demais ferramentas ----------
     o += f'<text x="{fx}" y="{ly}" {MONO} font-size="14" fill="{DIM}">└ outras ferramentas</text>'
@@ -450,11 +515,11 @@ def stack():
     for i, (name, col) in enumerate(STACK):
         r, c = divmod(i, cols)
         in_row = min(cols, len(STACK) - r * cols)
-        x0 = (W - (in_row * cw + (in_row - 1) * gx)) / 2
+        x0 = fx if mobile else (W - (in_row * cw + (in_row - 1) * gx)) / 2
         x = x0 + c * (cw + gx)
         y = top + r * (ch + gy)
         a = i * .35 / T2
-        chip = (f'<rect width="{cw}" height="{ch}" rx="14" fill="{PANEL}" stroke="{BORDER}" stroke-width="1.5">'
+        chip = (f'<rect width="{cw:.0f}" height="{ch}" rx="14" fill="{PANEL}" stroke="{BORDER}" stroke-width="1.5">'
                 f'<animate attributeName="stroke" dur="{T2:.1f}s" repeatCount="indefinite" '
                 f'keyTimes="0;{a:.3f};{a+.04:.3f};{a+.12:.3f};1" values="{BORDER};{BORDER};{OR};{BORDER};{BORDER}"/></rect>'
                 f'<circle cx="26" cy="{ch/2}" r="6" fill="{col}"/>'
@@ -464,14 +529,14 @@ def stack():
     o = frame(W, H) + stars(W, H, 18) + o
     defs = (border_gradient("bd", 12) + border_gradient("bd2", 5) + GLOW
             + '<filter id="soft" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>'
-            + f'<radialGradient id="rg" cx=".12" cy=".5" r=".6"><stop offset="0" stop-color="{OR}" stop-opacity=".22"/>'
+            + f'<radialGradient id="rg" cx="{.25 if mobile else .12}" cy="{.25 if mobile else .5}" r=".6"><stop offset="0" stop-color="{OR}" stop-opacity=".22"/>'
               f'<stop offset="1" stop-color="{OR}" stop-opacity="0"/></radialGradient>'
             + '<linearGradient id="gem" gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21">'
               '<stop offset="0" stop-color="#439ddf"/><stop offset=".3" stop-color="#4f87ed"/>'
               '<stop offset=".6" stop-color="#9476c5"/><stop offset=".85" stop-color="#bc688e"/>'
               '<stop offset="1" stop-color="#d6645d"/></linearGradient>'
             + f'<linearGradient id="bar" x1="0" x2="1"><stop offset="0" stop-color="{OR_D}"/><stop offset="1" stop-color="{MANILLA}"/></linearGradient>')
-    save("stack.svg", svg(W, H, o, defs))
+    save(mname("stack.svg", mobile), svg(W, H, o, defs))
 
 
 # ======================================================= 5. projetos
@@ -486,26 +551,38 @@ PROJETOS = [
 ]
 
 
-def projects():
-    W, H = 600, 210
+def projects(mobile=False):
+    """No celular os cards (2 por linha) mostram só o essencial, em letras grandes."""
+    W, H = (300, 170) if mobile else (600, 210)
     for i, (name, lang, col, desc) in enumerate(PROJETOS):
         o = (f'<rect x="2" y="2" width="{W-4}" height="{H-4}" rx="18" fill="{BG}" stroke="{BORDER}" stroke-width="1.5"/>'
              f'<rect x="2" y="2" width="{W-4}" height="{H-4}" rx="18" fill="none" stroke="url(#bd)" stroke-width="2" '
-             f'stroke-dasharray="180 1400"><animate attributeName="stroke-dashoffset" from="0" to="-1580" dur="6s" '
+             f'stroke-dasharray="{90 if mobile else 180} {2*(W+H)}"><animate attributeName="stroke-dashoffset" from="0" to="-{2*(W+H)-8}" dur="6s" '
              f'begin="{-i*1.1:.1f}s" repeatCount="indefinite"/></rect>')
-        o += (f'<circle cx="38" cy="50" r="7" fill="{OR}"><animate attributeName="opacity" values="1;.3;1" '
-              f'dur="1.6s" begin="{-i*.3:.1f}s" repeatCount="indefinite"/></circle>')
-        o += f'<text x="58" y="57" {MONO} font-size="21" font-weight="700" fill="{CREAM}">{esc(name)}</text>'
-        o += f'<text x="{W-30}" y="57" text-anchor="end" {MONO} font-size="13" fill="{DIM}">Read</text>'
-        for j, line in enumerate(textwrap.wrap(desc, 52)[:2]):
-            pre = "└ " if j == 0 else "  "
-            o += f'<text x="34" y="{98 + j*26}" {MONO} font-size="15.5" fill="{MUTED}" xml:space="preserve"><tspan fill="{DIM}">{pre}</tspan>{esc(line)}</text>'
-        o += f'<line x1="30" y1="150" x2="{W-30}" y2="150" stroke="{BORDER}"/>'
-        o += f'<circle cx="40" cy="178" r="6" fill="{col}"/>'
-        o += f'<text x="54" y="183" {MONO} font-size="14" fill="{CREAM}">{lang}</text>'
-        o += (f'<text x="{W-30}" y="183" text-anchor="end" {MONO} font-size="14" fill="{OR}">abrir ↗'
-              f'<animate attributeName="x" values="{W-30};{W-26};{W-30}" dur="1.8s" repeatCount="indefinite"/></text>')
-        save(f"projeto-{name}.svg", svg(W, H, o, border_gradient("bd", 6)))
+        if mobile:
+            fs = min(25, 262 / (len(name) * .62))
+            o += (f'<circle cx="28" cy="38" r="6" fill="{OR}"><animate attributeName="opacity" values="1;.3;1" '
+                  f'dur="1.6s" begin="{-i*.3:.1f}s" repeatCount="indefinite"/></circle>'
+                  f'<text x="42" y="44" {MONO} font-size="17" fill="{DIM}">Read</text>'
+                  f'<text x="22" y="88" {MONO} font-size="{fs:.1f}" font-weight="700" fill="{CREAM}">{esc(name)}</text>'
+                  f'<line x1="20" y1="112" x2="{W-20}" y2="112" stroke="{BORDER}"/>'
+                  f'<circle cx="30" cy="141" r="8" fill="{col}"/>'
+                  f'<text x="46" y="148" {MONO} font-size="{19 if len(lang) > 4 else 20}" fill="{CREAM}">{lang}</text>'
+                  f'<text x="{W-18}" y="148" text-anchor="end" {MONO} font-size="20" fill="{OR}">abrir ↗</text>')
+        else:
+            o += (f'<circle cx="38" cy="50" r="7" fill="{OR}"><animate attributeName="opacity" values="1;.3;1" '
+                  f'dur="1.6s" begin="{-i*.3:.1f}s" repeatCount="indefinite"/></circle>')
+            o += f'<text x="58" y="57" {MONO} font-size="21" font-weight="700" fill="{CREAM}">{esc(name)}</text>'
+            o += f'<text x="{W-30}" y="57" text-anchor="end" {MONO} font-size="13" fill="{DIM}">Read</text>'
+            for j, line in enumerate(textwrap.wrap(desc, 52)[:2]):
+                pre = "└ " if j == 0 else "  "
+                o += f'<text x="34" y="{98 + j*26}" {MONO} font-size="15.5" fill="{MUTED}" xml:space="preserve"><tspan fill="{DIM}">{pre}</tspan>{esc(line)}</text>'
+            o += f'<line x1="30" y1="150" x2="{W-30}" y2="150" stroke="{BORDER}"/>'
+            o += f'<circle cx="40" cy="178" r="6" fill="{col}"/>'
+            o += f'<text x="54" y="183" {MONO} font-size="14" fill="{CREAM}">{lang}</text>'
+            o += (f'<text x="{W-30}" y="183" text-anchor="end" {MONO} font-size="14" fill="{OR}">abrir ↗'
+                  f'<animate attributeName="x" values="{W-30};{W-26};{W-30}" dur="1.8s" repeatCount="indefinite"/></text>')
+        save(mname(f"projeto-{name}.svg", mobile), svg(W, H, o, border_gradient("bd", 6)))
 
 
 # ======================================================= 6. mascote andando
@@ -646,17 +723,22 @@ def shopee_icon(size=50):
             f'<path transform="scale(1.4) translate(-12,-12)" fill="#fff" d="{logo_path("shopee")}"/></g>')
 
 
-def nizashop_hero():
-    W, H = 1200, 420
+def nizashop_hero(mobile=False):
+    W, H = (W_MOBILE, 400) if mobile else (1200, 420)
     o = (f'<clipPath id="cl"><rect width="{W}" height="{H}" rx="26"/></clipPath><g clip-path="url(#cl)">'
          f'<image href="{b64(NIZA_DIR / "fundos" / "faixa-hero.jpg")}" width="{W}" height="{H}" preserveAspectRatio="xMidYMid slice"/>'
-         f'{niza_glows(W, H)}{sparkles(W, H, 26)}{light_sweep(W, H)}</g>')
-    o += f'<g transform="translate(290,72) scale(.96)">{niza_logo(.6)}</g>'
-    o += (f'<g opacity="1">{reveal(2.2, .6)}<rect x="{W/2-190}" y="312" width="380" height="44" rx="22" fill="{LILAS}"/>'
-          f'<text x="{W/2}" y="341" text-anchor="middle" {SANS} font-size="18" font-weight="700" fill="{AMEIXA}">{esc(NIZA_CEO)}</text></g>')
+         f'{niza_glows(W, H)}{sparkles(W, H, 16 if mobile else 26)}{light_sweep(W, H)}</g>')
+    if mobile:
+        o += f'<g transform="translate({(W - 643*.58)/2:.0f},96) scale(.58)">{niza_logo(.6)}</g>'
+        pw, py = 360, 290
+    else:
+        o += f'<g transform="translate(290,72) scale(.96)">{niza_logo(.6)}</g>'
+        pw, py = 380, 312
+    o += (f'<g opacity="1">{reveal(2.2, .6)}<rect x="{W/2-pw/2}" y="{py}" width="{pw}" height="44" rx="22" fill="{LILAS}"/>'
+          f'<text x="{W/2}" y="{py+29}" text-anchor="middle" {SANS} font-size="18" font-weight="700" fill="{AMEIXA}">{esc(NIZA_CEO)}</text></g>')
     o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="26" fill="none" stroke="url(#nb)" stroke-width="2"/>'
     defs = SHINE + BEAM + NBLUR + niza_border()
-    (NIZA_DIR / "abertura.svg").write_text(svg(W, H, o, defs), encoding="utf-8")
+    (NIZA_DIR / mname("abertura.svg", mobile)).write_text(svg(W, H, o, defs), encoding="utf-8")
 
 
 def niza_border(gid="nb"):
@@ -677,44 +759,60 @@ def niza_icon(kind, c):
     return f'<path d="M0 14 C-22 0 -14 -18 0 -8 C14 -18 22 0 0 14Z" fill="{c}"/>'
 
 
-def nizashop_pilares():
-    W, cw, ch, g = 1200, 270, 190, 20
-    H = ch + 40
-    x0 = (W - (4 * cw + 3 * g)) / 2
+def nizashop_pilares(mobile=False):
+    """Computador: 4 cards lado a lado. Celular: 4 cards horizontais empilhados."""
+    if mobile:
+        W, cw, ch, g = W_MOBILE, W_MOBILE - 32, 104, 14
+        H = 4 * ch + 3 * g + 40
+    else:
+        W, cw, ch, g = 1200, 270, 190, 20
+        H = ch + 40
+    x0 = 16 if mobile else (W - (4 * cw + 3 * g)) / 2
     o = ""
     for i, (ic, t, sub) in enumerate(NIZA_PILARES):
-        x = x0 + i * (cw + g)
         a = i * .25
+        icon = (f'<circle r="30" fill="{LAVANDA}" opacity=".1"/>'
+                f'<g><animateTransform attributeName="transform" type="scale" values="1;1.15;1" dur="2s" begin="{-a:.2f}s" repeatCount="indefinite"/>'
+                f'{niza_icon(ic, PITAYA if i % 2 == 0 else PESSEGO)}</g>')
         card = (f'<rect width="{cw}" height="{ch}" rx="22" fill="{AMEIXA}"/>'
                 f'<rect width="{cw}" height="{ch}" rx="22" fill="url(#pg{i})"/>'
-                f'<rect width="{cw}" height="{ch}" rx="22" fill="none" stroke="{LILAS}" stroke-opacity=".35"/>'
-                f'<g transform="translate(52,58)"><circle r="30" fill="{LAVANDA}" opacity=".1"/>'
-                f'<g><animateTransform attributeName="transform" type="scale" values="1;1.15;1" dur="2s" begin="{-a:.2f}s" repeatCount="indefinite"/>'
-                f'{niza_icon(ic, PITAYA if i % 2 == 0 else PESSEGO)}</g></g>'
-                f'<text x="26" y="128" {SANS} font-size="24" font-weight="800" fill="#fff">{esc(t)}</text>'
-                f'<text x="26" y="158" {SANS} font-size="15" fill="{LILAS}">{esc(sub)}</text>')
-        o += f'<g transform="translate({x:.0f},20)">{bob(card, 5, 2.4 + i * .3)}</g>'
+                f'<rect width="{cw}" height="{ch}" rx="22" fill="none" stroke="{LILAS}" stroke-opacity=".35"/>')
+        if mobile:
+            card += (f'<g transform="translate(52,{ch/2})">{icon}</g>'
+                     f'<text x="100" y="{ch/2 - 4}" {SANS} font-size="23" font-weight="800" fill="#fff">{esc(t)}</text>'
+                     f'<text x="100" y="{ch/2 + 22}" {SANS} font-size="15.5" fill="{LILAS}">{esc(sub)}</text>')
+            x, y = x0, 20 + i * (ch + g)
+        else:
+            card += (f'<g transform="translate(52,58)">{icon}</g>'
+                     f'<text x="26" y="128" {SANS} font-size="24" font-weight="800" fill="#fff">{esc(t)}</text>'
+                     f'<text x="26" y="158" {SANS} font-size="15" fill="{LILAS}">{esc(sub)}</text>')
+            x, y = x0 + i * (cw + g), 20
+        o += f'<g transform="translate({x:.0f},{y})">{bob(card, 5, 2.4 + i * .3)}</g>'
     defs = "".join(f'<radialGradient id="pg{i}" cx=".2" cy=".2" r=".9"><stop offset="0" stop-color="{c}" stop-opacity=".35"/>'
                    f'<stop offset="1" stop-color="{c}" stop-opacity="0"/></radialGradient>'
                    for i, c in enumerate([LILAS, PITAYA, LILAS, PESSEGO]))
-    (NIZA_DIR / "pilares.svg").write_text(svg(W, H, o, defs), encoding="utf-8")
+    (NIZA_DIR / mname("pilares.svg", mobile)).write_text(svg(W, H, o, defs), encoding="utf-8")
 
 
-def nizashop_paleta():
-    W, n, g = 1200, len(NIZA_PALETA), 16
-    cw = (W - 40 - (n - 1) * g) / n
-    H = 190
+def nizashop_paleta(mobile=False):
+    n, g = len(NIZA_PALETA), 16
+    cols = 3 if mobile else n
+    W = W_MOBILE if mobile else 1200
+    cw = (W - 40 - (cols - 1) * g) / cols
+    rows = math.ceil(n / cols)
+    H = 40 + rows * 150 + (rows - 1) * g
     o = ""
     for i, (nome, c) in enumerate(NIZA_PALETA):
-        x = 20 + i * (cw + g)
+        r, k = divmod(i, cols)
+        x, y = 20 + k * (cw + g), 20 + r * (150 + g)
         dark = c in (AMEIXA, NOITE, PITAYA)
         tc = "#fff" if dark else AMEIXA
-        o += (f'<g transform="translate({x:.0f},20)"><g opacity="1">{reveal(.2 + i * .15, .4)}'
+        o += (f'<g transform="translate({x:.0f},{y})"><g opacity="1">{reveal(.2 + i * .15, .4)}'
               f'<rect width="{cw:.0f}" height="150" rx="20" fill="{c}" stroke="{LILAS}" stroke-opacity=".4">'
               f'<animate attributeName="height" values="150;150;140;150" keyTimes="0;.7;.85;1" dur="4s" begin="{i*.3:.1f}s" repeatCount="indefinite"/></rect>'
-              f'<text x="18" y="104" {SANS} font-size="20" font-weight="800" fill="{tc}">{esc(nome)}</text>'
-              f'<text x="18" y="130" {MONO} font-size="14" fill="{tc}" opacity=".8">{c}</text></g></g>')
-    (NIZA_DIR / "paleta.svg").write_text(svg(W, H, o), encoding="utf-8")
+              f'<text x="16" y="104" {SANS} font-size="{17 if mobile else 20}" font-weight="800" fill="{tc}">{esc(nome)}</text>'
+              f'<text x="16" y="130" {MONO} font-size="{12.5 if mobile else 14}" fill="{tc}" opacity=".8">{c}</text></g></g>')
+    (NIZA_DIR / mname("paleta.svg", mobile)).write_text(svg(W, H, o), encoding="utf-8")
 
 
 # CONTEÚDO: ferramentas usadas para criar a loja (logo em scripts/logos/)
@@ -734,34 +832,49 @@ def mini_logo(icon, size=32):
     return f'<g transform="scale({size/50:.3f})">{tool_icon(icon, "#fff")}</g>'
 
 
-def nizashop_card():
-    """Card de destaque no perfil (assets/nizashop-destaque.svg)."""
-    W, H = 1200, 370
+def nizashop_card(mobile=False):
+    """Card de destaque no perfil (assets/nizashop-destaque.svg e -m.svg)."""
+    W, H = (W_MOBILE, 560) if mobile else (1200, 370)
     o = (f'<clipPath id="cl"><rect width="{W}" height="{H}" rx="22"/></clipPath><g clip-path="url(#cl)">'
          f'<image href="{b64(NIZA_DIR / "fundos" / "faixa-card.jpg")}" width="{W}" height="{H}" preserveAspectRatio="xMidYMid slice"/>'
          f'{niza_glows(W, H)}{sparkles(W, H, 20)}{light_sweep(W, H, 7)}</g>')
-    o += f'<g transform="translate(44,36) scale(.62)">{niza_logo(.4)}</g>'
-    o += (f'<rect x="64" y="196" width="232" height="40" rx="20" fill="{PITAYA}"/>'
-          f'<text x="180" y="222" text-anchor="middle" {SANS} font-size="17" font-weight="800" fill="#fff" letter-spacing=".5">FUNDADOR &amp; CEO</text>')
     btn = (f'<rect width="196" height="46" rx="23" fill="{LILAS}"/>'
            f'<text x="98" y="29" text-anchor="middle" {SANS} font-size="18" font-weight="800" fill="{AMEIXA}">conhecer a loja →</text>')
-    o += f'<g transform="translate({W-250},196)">{bob(btn, 3, 1.6)}</g>'
-    o += f'<g transform="translate({W-152},96)">{bob(shopee_icon(64), 8, 1.4)}</g>'
-    # faixa "feita com"
-    fy = 266
-    o += (f'<rect x="44" y="{fy}" width="{W-88}" height="72" rx="20" fill="{NOITE}" fill-opacity=".55" stroke="{LILAS}" stroke-opacity=".3"/>'
-          f'<text x="74" y="{fy+43}" {SANS} font-size="17" font-weight="600" fill="{LILAS}">loja criada com</text>')
-    x = 236
-    for i, (nome, icon) in enumerate(NIZA_FEITA_COM):
-        chip = (f'<rect x="-8" y="-24" width="{len(nome)*11.5 + 68:.0f}" height="48" rx="24" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".18"/>'
-                f'<g transform="translate(20,0)">{mini_logo(icon, 30)}</g>'
-                f'<text x="46" y="7" {SANS} font-size="19" font-weight="700" fill="#fff">{esc(nome)}</text>')
-        o += f'<g transform="translate({x},{fy+36})"><g opacity="1">{reveal(1.2 + i*.35, .5)}{chip}</g></g>'
-        x += len(nome) * 11.5 + 88
-    o += (f'<text x="{W-74}" y="{fy+43}" text-anchor="end" {SANS} font-size="16" fill="{LILAS}">'
-          f'+ tráfego com IA na Shopee</text>')
+    pill = (f'<rect width="232" height="40" rx="20" fill="{PITAYA}"/>'
+            f'<text x="116" y="26" text-anchor="middle" {SANS} font-size="17" font-weight="800" fill="#fff" letter-spacing=".5">FUNDADOR &amp; CEO</text>')
+    vend = f'<g>{shopee_icon(30)}</g><text x="26" y="6" {SANS} font-size="17" font-weight="700" fill="#fff">Vendedor na Shopee</text>'
+    if mobile:
+        o += f'<g transform="translate({(W - 643*.58)/2:.0f},30) scale(.58)">{niza_logo(.4)}</g>'
+        o += f'<g transform="translate({(W - 232)/2:.0f},164)">{pill}</g>'
+        o += f'<g transform="translate({W/2 - 98:.0f},236)">{vend}</g>'
+        fy = 270
+        o += (f'<rect x="20" y="{fy}" width="{W-40}" height="190" rx="20" fill="{NOITE}" fill-opacity=".55" stroke="{LILAS}" stroke-opacity=".3"/>'
+              f'<text x="{W/2}" y="{fy+34}" text-anchor="middle" {SANS} font-size="16" font-weight="600" fill="{LILAS}">loja criada com</text>')
+        for i, (nome, icon) in enumerate(NIZA_FEITA_COM):
+            cw_ = W - 88
+            chip = (f'<rect x="0" y="-22" width="{cw_}" height="44" rx="22" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".18"/>'
+                    f'<g transform="translate(28,0)">{mini_logo(icon, 28)}</g>'
+                    f'<text x="54" y="7" {SANS} font-size="19" font-weight="700" fill="#fff">{esc(nome)}</text>')
+            o += f'<g transform="translate(44,{fy + 62 + i*46})"><g opacity="1">{reveal(1.2 + i*.35, .5)}{chip}</g></g>'
+        o += f'<g transform="translate({(W - 196)/2:.0f},{H - 76})">{bob(btn, 3, 1.6)}</g>'
+    else:
+        o += f'<g transform="translate(44,36) scale(.62)">{niza_logo(.4)}</g>'
+        o += f'<g transform="translate(64,196)">{pill}</g>'
+        o += f'<g transform="translate({W-250},196)">{bob(btn, 3, 1.6)}</g>'
+        o += f'<g transform="translate({W-152},96)">{bob(shopee_icon(64), 8, 1.4)}</g>'
+        fy = 266
+        o += (f'<rect x="44" y="{fy}" width="{W-88}" height="72" rx="20" fill="{NOITE}" fill-opacity=".55" stroke="{LILAS}" stroke-opacity=".3"/>'
+              f'<text x="74" y="{fy+43}" {SANS} font-size="17" font-weight="600" fill="{LILAS}">loja criada com</text>')
+        x = 236
+        for i, (nome, icon) in enumerate(NIZA_FEITA_COM):
+            chip = (f'<rect x="-8" y="-24" width="{len(nome)*11.5 + 68:.0f}" height="48" rx="24" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".18"/>'
+                    f'<g transform="translate(20,0)">{mini_logo(icon, 30)}</g>'
+                    f'<text x="46" y="7" {SANS} font-size="19" font-weight="700" fill="#fff">{esc(nome)}</text>')
+            o += f'<g transform="translate({x},{fy+36})"><g opacity="1">{reveal(1.2 + i*.35, .5)}{chip}</g></g>'
+            x += len(nome) * 11.5 + 88
+        o += f'<g transform="translate({W - 258},{fy + 36})">{vend}</g>'
     o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="22" fill="none" stroke="url(#nb)" stroke-width="2.5"/>'
-    save("nizashop-destaque.svg", svg(W, H, o, SHINE + BEAM + NBLUR + GEM + niza_border()))
+    save(mname("nizashop-destaque.svg", mobile), svg(W, H, o, SHINE + BEAM + NBLUR + GEM + niza_border()))
 
 
 def data_uri(path, size=None, fmt="JPEG", quality=72, crop=None):
@@ -865,33 +978,40 @@ def bento_calendario(w, h):
             kt, vals = f"0;{b-e:.4f};{b:.4f};{1-e:.4f};1", "1 1;1 1;1 0;1 0;1 1"
         else:
             kt, vals = f"0;{a:.4f};{a+e:.4f};{b-e:.4f};{b:.4f};1", "1 0;1 0;1 1;1 1;1 0;1 0"
-        fs = 92 if len(txt) <= 5 else 62
+        fs = min(92 if len(txt) <= 5 else 62, (w - 80) / (len(txt) * .56))
         base = "" if i == 0 else ' transform="scale(1,0)"'
         o += (f'<g transform="translate({cx},{cy-13})"><g{base}><animateTransform attributeName="transform" type="scale" '
               f'dur="{T}s" repeatCount="indefinite" keyTimes="{kt}" values="{vals}"/>'
-              f'<text y="{fs*.36:.0f}" text-anchor="middle" {SANS} font-size="{fs}" font-weight="900" fill="{c}" letter-spacing="-2">{esc(txt)}</text></g></g>')
+              f'<text y="{fs*.36:.0f}" text-anchor="middle" {SANS} font-size="{fs:.0f}" font-weight="900" fill="{c}" letter-spacing="-2">{esc(txt)}</text></g></g>')
         dots += (f'<circle cx="{cx - 48 + i*24}" cy="236" r="5" fill="{c}" opacity=".3">'
                  f'<animate attributeName="opacity" dur="{T}s" repeatCount="indefinite" calcMode="discrete" '
                  f'keyTimes="0;{a:.4f};{b:.4f}" values=".3;1;.3"/></circle>')
     return o + dots
 
 
-def bento_trafego(w, h):
+def bento_vendedor(w, h):
+    """Vitrine de produtos que se acendem em sequência + selo 'Vendedor na Shopee'."""
     o = f'<g transform="translate({w-44},40)">{bob(shopee_icon(34), 3, 1.6)}</g>'
-    x0, x1, yb = 26, w - 26, 196
-    pts = [(x0, 186), (x0 + 40, 176), (x0 + 75, 181), (x0 + 115, 156), (x0 + 150, 162), (x0 + 190, 128), (x0 + 225, 136), (x0 + 262, 98), (x1, 76)]
-    line = " ".join(f"{x:.0f},{y}" for x, y in pts)
-    area = f"M{x0} {yb} L" + " L".join(f"{x:.0f} {y}" for x, y in pts) + f" L{x1} {yb} Z"
-    o += (f'<path d="{area}" fill="url(#ar)"/>'
-          f'<polyline points="{line}" fill="none" stroke="{SHOPEE}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" '
-          f'pathLength="1" stroke-dasharray="1" stroke-dashoffset="0">'
-          f'<animate attributeName="stroke-dashoffset" values="1;0;0;1" keyTimes="0;.4;.9;1" dur="6s" repeatCount="indefinite"/></polyline>'
-          f'<circle r="6" fill="{SHOPEE}" cx="{x1}" cy="76"><animate attributeName="r" values="5;8;5" dur="1.4s" repeatCount="indefinite"/></circle>')
-    o += (f'<rect x="{x0}" y="66" width="46" height="132" fill="url(#scan)">'
-          f'<animate attributeName="x" values="{x0-46};{x1}" dur="3s" repeatCount="indefinite"/></rect>')
-    o += (f'<rect x="{x0}" y="212" width="{w-52}" height="30" rx="15" fill="#fff" fill-opacity=".08" stroke="{LILAS}" stroke-opacity=".3"/>'
-          f'<circle cx="{x0+18}" cy="227" r="5" fill="#6ee7b7"><animate attributeName="opacity" values="1;.3;1" dur="1.2s" repeatCount="indefinite"/></circle>'
-          f'<text x="{x0+32}" y="232" {SANS} font-size="13.5" font-weight="700" fill="#fff">IA otimizando anúncios</text>')
+    cols, gap, x0, y0 = 3, 10, 24, 60
+    cw = (w - 2 * x0 - (cols - 1) * gap) / cols
+    ch = 60
+    T = 6 * .6 + 1.2
+    for k in range(6):
+        r, c = divmod(k, cols)
+        x, y = x0 + c * (cw + gap), y0 + r * (ch + gap)
+        a = k * .6 / T
+        o += (f'<g transform="translate({x:.1f},{y})">'
+              f'<rect width="{cw:.1f}" height="{ch}" rx="12" fill="#ffffff" fill-opacity=".07" stroke="#ffffff" stroke-opacity=".14">'
+              f'<animate attributeName="stroke" dur="{T:.1f}s" repeatCount="indefinite" keyTimes="0;{a:.3f};{a+.05:.3f};{a+.2:.3f};1" '
+              f'values="#ffffff;#ffffff;{SHOPEE};#ffffff;#ffffff"/>'
+              f'<animate attributeName="stroke-opacity" dur="{T:.1f}s" repeatCount="indefinite" keyTimes="0;{a:.3f};{a+.05:.3f};{a+.2:.3f};1" '
+              f'values=".14;.14;1;.14;.14"/></rect>'
+              f'<rect x="8" y="8" width="{ch-16}" height="{ch-16}" rx="8" fill="{[LILAS, PESSEGO, PITAYA][k % 3]}" fill-opacity=".55"/>'
+              f'<rect x="{ch}" y="16" width="{cw-ch-10:.1f}" height="7" rx="3.5" fill="#ffffff" fill-opacity=".45"/>'
+              f'<rect x="{ch}" y="31" width="{(cw-ch-10)*.6:.1f}" height="7" rx="3.5" fill="{SHOPEE}" fill-opacity=".8"/></g>')
+    o += (f'<rect x="{x0}" y="{h-50}" width="{w-2*x0}" height="30" rx="15" fill="#fff" fill-opacity=".08" stroke="{LILAS}" stroke-opacity=".3"/>'
+          f'<circle cx="{x0+18}" cy="{h-35}" r="5" fill="#6ee7b7"><animate attributeName="opacity" values="1;.3;1" dur="1.2s" repeatCount="indefinite"/></circle>'
+          f'<text x="{x0+32}" y="{h-30}" {SANS} font-size="13.5" font-weight="700" fill="#fff">Vendedor na Shopee</text>')
     return o
 
 
@@ -951,22 +1071,40 @@ def bento_avisos(w, h):
     return o + '</g>'
 
 
-def nizashop_bento():
-    """Painel bento animado da loja (assets/nizashop-bento.svg)."""
-    W, H, P, G = 1200, 560, 20, 16
-    pw = 300
-    rx0 = P + pw + G
-    rw = W - P - rx0
-    th = (H - 2 * P - G) / 2
-    cal_w, sel_w = 480, 300
-    phone, phone_defs = bento_phone(pw, H - 2 * P)
-    o = (f'<rect width="{W}" height="{H}" rx="28" fill="{NOITE}"/>{niza_glows(W, H)}'
-         + bento_tile(P, P, pw, H - 2 * P, "LOJA NA SHOPEE", phone, 0)
-         + bento_tile(rx0, P, cal_w, th, "CALENDÁRIO DE CAMPANHAS", bento_calendario(cal_w, th), 1)
-         + bento_tile(rx0 + cal_w + G, P, rw - cal_w - G, th, "TRÁFEGO COM IA", bento_trafego(rw - cal_w - G, th), 2)
-         + bento_tile(rx0, P + th + G, sel_w, th, "CUPONS", bento_cupom(sel_w, th), 3)
-         + bento_tile(rx0 + sel_w + G, P + th + G, rw - sel_w - G, th, "NOTIFICAÇÕES", bento_avisos(rw - sel_w - G, th), 4)
-         + f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="28" fill="none" stroke="url(#nb)" stroke-width="2.5"/>')
+def nizashop_bento(mobile=False):
+    """Painel bento animado da loja (assets/nizashop-bento.svg e -m.svg)."""
+    P, G = 20, 16
+    if mobile:
+        W = W_MOBILE
+        tw = W - 2 * P
+        tiles = [("LOJA NA SHOPEE", 500, "phone"), ("CALENDÁRIO DE CAMPANHAS", 262, "cal"),
+                 ("VENDEDOR NA SHOPEE", 262, "vend"), ("CUPONS", 230, "cup"), ("NOTIFICAÇÕES", 262, "av")]
+        H = P * 2 + sum(t[1] for t in tiles) + G * (len(tiles) - 1)
+        y = P
+        o = f'<rect width="{W}" height="{H}" rx="28" fill="{NOITE}"/>{niza_glows(W, H)}'
+        phone_defs = ""
+        for i, (label, th, kind) in enumerate(tiles):
+            if kind == "phone":
+                inner, phone_defs = bento_phone(tw, th)
+            else:
+                inner = {"cal": bento_calendario, "vend": bento_vendedor, "cup": bento_cupom, "av": bento_avisos}[kind](tw, th)
+            o += bento_tile(P, y, tw, th, label, inner, i)
+            y += th + G
+    else:
+        W, H = 1200, 560
+        pw = 300
+        rx0 = P + pw + G
+        rw = W - P - rx0
+        th = (H - 2 * P - G) / 2
+        cal_w, sel_w = 480, 300
+        phone, phone_defs = bento_phone(pw, H - 2 * P)
+        o = (f'<rect width="{W}" height="{H}" rx="28" fill="{NOITE}"/>{niza_glows(W, H)}'
+             + bento_tile(P, P, pw, H - 2 * P, "LOJA NA SHOPEE", phone, 0)
+             + bento_tile(rx0, P, cal_w, th, "CALENDÁRIO DE CAMPANHAS", bento_calendario(cal_w, th), 1)
+             + bento_tile(rx0 + cal_w + G, P, rw - cal_w - G, th, "VENDEDOR NA SHOPEE", bento_vendedor(rw - cal_w - G, th), 2)
+             + bento_tile(rx0, P + th + G, sel_w, th, "CUPONS", bento_cupom(sel_w, th), 3)
+             + bento_tile(rx0 + sel_w + G, P + th + G, rw - sel_w - G, th, "NOTIFICAÇÕES", bento_avisos(rw - sel_w - G, th), 4))
+    o += f'<rect x="1" y="1" width="{W-2}" height="{H-2}" rx="28" fill="none" stroke="url(#nb)" stroke-width="2.5"/>'
     tgs = "".join(f'<radialGradient id="tg{i}" cx="{cx}" cy="{cy}" r=".9"><stop offset="0" stop-color="{c}" stop-opacity=".28"/>'
                   f'<stop offset="1" stop-color="{c}" stop-opacity="0"/></radialGradient>'
                   for i, (c, cx, cy) in enumerate([(LILAS, .5, .9), (PITAYA, .1, .1), (SHOPEE, .9, .1), (PESSEGO, .5, .5), (LILAS, .9, .9)]))
@@ -974,10 +1112,8 @@ def nizashop_bento():
             + '<linearGradient id="cshine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="120" y2="0">'
               '<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".45"/>'
               '<stop offset="1" stop-color="#fff" stop-opacity="0"/>'
-              '<animateTransform attributeName="gradientTransform" type="translate" values="-160 0;-160 0;420 0" keyTimes="0;.6;1" dur="3.5s" repeatCount="indefinite"/></linearGradient>'
-            + f'<linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{SHOPEE}" stop-opacity=".35"/><stop offset="1" stop-color="{SHOPEE}" stop-opacity="0"/></linearGradient>'
-            + f'<linearGradient id="scan" x1="0" x2="1"><stop offset="0" stop-color="{LILAS}" stop-opacity="0"/><stop offset="1" stop-color="{LILAS}" stop-opacity=".35"/></linearGradient>')
-    save("nizashop-bento.svg", svg(W, H, o, defs))
+              '<animateTransform attributeName="gradientTransform" type="translate" values="-160 0;-160 0;420 0" keyTimes="0;.6;1" dur="3.5s" repeatCount="indefinite"/></linearGradient>')
+    save(mname("nizashop-bento.svg", mobile), svg(W, H, o, defs))
 
 
 def tl(pairs, T):
@@ -999,17 +1135,21 @@ DECK = {
     "titulo": "NizaShop · Apresentação institucional",
     "capa": ("Comprar bem, ", "com carinho."),
     "missao": [("Levar produtos ", "escolhidos a dedo,"), ("com preço justo e entrega rápida,", ""), ("para quem compra na Shopee.", "")],
+    # versão celular (linhas mais curtas)
+    "missao_m": [("Levar produtos", ""), ("", "escolhidos a dedo,"), ("com preço justo", ""), ("e entrega rápida,", ""),
+                 ("para quem compra", ""), ("na Shopee.", "")],
+    "titulo_m": "NizaShop · Institucional",
     "valor": [
         ("estrela", "Curadoria", ("seleção cuidadosa de cada", "produto do catálogo")),
         ("etiqueta", "Preço justo", ("ofertas, cupons e campanhas", "durante todo o ano")),
         ("coracao", "Experiência", ("embalagem própria e", "atendimento atencioso")),
     ],
-    "ciclo_texto": ("A IA otimiza os anúncios, os", "pedidos geram avaliações e os", "dados voltam para a IA."),
-    "ciclo": ["Anúncios", "Visitas", "Pedidos", "Avaliações", "Dados"],
+    "ciclo_texto": ("A IA ajuda na curadoria e no", "atendimento; os pedidos geram", "avaliações e o retorno melhora a loja."),
+    "ciclo": ["Curadoria", "Vitrine", "Pedidos", "Avaliações", "Melhorias"],
     "fases": [
         ("Identidade e lançamento", "marca, logo e kit de embalagem", "concluída"),
         ("Campanhas sazonais", "10.10, 11.11, 12.12 e Natal", "em andamento"),
-        ("Escala com IA", "anúncios e tráfego otimizados", ""),
+        ("Escala com IA", "catálogo e atendimento com IA", ""),
         ("Novos canais", "expandir além da Shopee", ""),
     ],
 }
@@ -1025,10 +1165,13 @@ def niza_static(word_fill=AMEIXA, box=AMEIXA, ink="#ffffff"):
     return o + "".join(f'<path transform="{tr}" fill="{word_fill}" d="{d}"/>' for tr, d in words)
 
 
-def nizashop_deck():
-    """Apresentação institucional que passa sozinha (assets/nizashop-deck.svg)."""
-    W, H, S, N = 1200, 470, 4.5, 5
+def nizashop_deck(mobile=False):
+    """Apresentação institucional que passa sozinha (assets/nizashop-deck.svg e -m.svg)."""
+    S, N = 4.5, 5
     T = S * N
+    W, H = (W_MOBILE, 700) if mobile else (1200, 470)
+    LX = 24 if mobile else 72          # margem esquerda do conteúdo
+    TOPBAR = 52 if mobile else 56
 
     def span(i):
         return i * S, (i + 1) * S
@@ -1061,63 +1204,107 @@ def nizashop_deck():
             out += anim(None, pts, T, "translate")
         return out
 
-    def label(i, txt):
-        return f'<text x="72" y="104" {SANS} font-size="13" font-weight="800" fill="{PITAYA}" letter-spacing="2.2">{esc(txt)}</text>'
+    def label(txt):
+        y = 92 if mobile else 104
+        return f'<text x="{LX}" y="{y}" {SANS} font-size="13" font-weight="800" fill="{PITAYA}" letter-spacing="2.2">{esc(txt)}</text>'
 
-    slides = []
-    # ---------- 1. capa ----------
-    c = label(0, "APRESENTAÇÃO INSTITUCIONAL")
-    c += f'<g transform="translate(62,124) scale(.62)">{niza_static()}</g>'
-    c += (f'<text x="72" y="312" {SANS} font-size="40" font-weight="900" fill="{AMEIXA}" letter-spacing="-1">{esc(DECK["capa"][0])}'
-          f'<tspan {SERIF} font-style="italic" font-weight="400" fill="{PITAYA}">{esc(DECK["capa"][1])}</tspan></text>')
-    c += (f'<g opacity="1">{appear(0, .6)}<rect x="72" y="342" width="318" height="42" rx="21" fill="{AMEIXA}"/>'
-          f'<circle cx="96" cy="363" r="5" fill="{PITAYA}"/>'
-          f'<text x="112" y="369" {SANS} font-size="16" font-weight="700" fill="#fff">Gabriel Niza · Fundador &amp; CEO</text></g>')
+    def italic(txt):
+        return f'<tspan {SERIF} font-style="italic" font-weight="400" fill="{PITAYA}">{esc(txt)}</tspan>'
+
     n_path, _ = niza_parts()
+    symbol = (f'<rect width="64" height="64" rx="18" fill="{AMEIXA}"/>'
+              f'<path d="{n_path}" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>'
+              f'<circle cx="42.5" cy="17" r="4.2" fill="{PITAYA}"/>')
+    slides = []
+
+    # ---------- 1. capa ----------
+    c = label("APRESENTAÇÃO INSTITUCIONAL")
+    if mobile:
+        c += f'<g transform="translate(14,106) scale(.5)">{niza_static()}</g>'
+        c += f'<text x="{LX}" y="262" {SANS} font-size="32" font-weight="900" fill="{AMEIXA}" letter-spacing="-1">{esc(DECK["capa"][0].strip())}</text>'
+        c += f'<text x="{LX}" y="302" {SERIF} font-size="36" font-style="italic" fill="{PITAYA}">{esc(DECK["capa"][1])}</text>'
+        pill_y, deco_xy, deco_k = 326, (W / 2, 520), .72
+    else:
+        c += f'<g transform="translate(62,124) scale(.62)">{niza_static()}</g>'
+        c += (f'<text x="{LX}" y="312" {SANS} font-size="40" font-weight="900" fill="{AMEIXA}" letter-spacing="-1">{esc(DECK["capa"][0])}'
+              f'{italic(DECK["capa"][1])}</text>')
+        pill_y, deco_xy, deco_k = 342, (940, 252), 1
+    c += (f'<g opacity="1">{appear(0, .6)}<rect x="{LX}" y="{pill_y}" width="318" height="42" rx="21" fill="{AMEIXA}"/>'
+          f'<circle cx="{LX + 24}" cy="{pill_y + 21}" r="5" fill="{PITAYA}"/>'
+          f'<text x="{LX + 40}" y="{pill_y + 27}" {SANS} font-size="16" font-weight="700" fill="#fff">Gabriel Niza · Fundador &amp; CEO</text></g>')
     deco = (f'<circle r="150" fill="{LAVANDA}"/>'
             f'<circle r="118" fill="none" stroke="{LILAS}" stroke-width="2" stroke-dasharray="4 10">'
             f'<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="30s" repeatCount="indefinite"/></circle>'
             f'<g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="7s" repeatCount="indefinite"/>'
             f'<circle cx="118" cy="0" r="7" fill="{PITAYA}"/></g>'
-            + bob(f'<g transform="translate(-72,-72) scale(2.25)"><rect width="64" height="64" rx="18" fill="{AMEIXA}"/>'
-                  f'<path d="{n_path}" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>'
-                  f'<circle cx="42.5" cy="17" r="4.2" fill="{PITAYA}"/></g>', 8, 3))
-    c += f'<g transform="translate(940,252)">{deco}</g>'
+            + bob(f'<g transform="translate(-72,-72) scale(2.25)">{symbol}</g>', 8, 3))
+    c += f'<g transform="translate({deco_xy[0]:.0f},{deco_xy[1]}) scale({deco_k})">{deco}</g>'
     slides.append(c)
 
     # ---------- 2. missão ----------
-    c = label(1, "01 — MISSÃO")
-    c += f'<text x="64" y="262" {SERIF} font-size="210" fill="{LILAS}" opacity=".45">“</text>'
-    for k, (txt, it) in enumerate(DECK["missao"]):
-        extra = f'<tspan {SERIF} font-style="italic" font-weight="400" fill="{PITAYA}">{esc(it)}</tspan>' if it else ""
-        c += (f'<g opacity="1">{appear(1, .35 + k * .3, rise=14)}<text x="170" y="{196 + k*56}" {SANS} font-size="38" '
-              f'font-weight="800" fill="{AMEIXA}" letter-spacing="-1">{esc(txt)}{extra}</text></g>')
-    c += (f'<g opacity="1">{appear(1, 1.5)}<line x1="172" y1="352" x2="212" y2="352" stroke="{PITAYA}" stroke-width="3"/>'
-          f'<text x="226" y="358" {SANS} font-size="16" font-weight="600" fill="{INK2}">Gabriel Niza, Fundador &amp; CEO</text></g>')
+    c = label("01 — MISSÃO")
+    if mobile:
+        c += f'<text x="6" y="236" {SERIF} font-size="170" fill="{LILAS}" opacity=".3">“</text>'
+        y = 170
+        for k, (txt, it) in enumerate(DECK["missao_m"]):
+            body = italic(it) if it else esc(txt)
+            c += (f'<g opacity="1">{appear(1, .3 + k * .18, rise=12)}<text x="{LX}" y="{y}" {SANS} font-size="29" '
+                  f'font-weight="800" fill="{AMEIXA}" letter-spacing="-.5">{body}</text></g>')
+            y += 44
+        ay = y + 14
+        c += (f'<g opacity="1">{appear(1, 1.6)}<line x1="{LX}" y1="{ay}" x2="{LX + 40}" y2="{ay}" stroke="{PITAYA}" stroke-width="3"/>'
+              f'<text x="{LX + 54}" y="{ay + 6}" {SANS} font-size="15" font-weight="600" fill="{INK2}">Gabriel Niza, Fundador &amp; CEO</text></g>')
+    else:
+        c += f'<text x="64" y="262" {SERIF} font-size="210" fill="{LILAS}" opacity=".45">“</text>'
+        for k, (txt, it) in enumerate(DECK["missao"]):
+            extra = italic(it) if it else ""
+            c += (f'<g opacity="1">{appear(1, .35 + k * .3, rise=14)}<text x="170" y="{196 + k*56}" {SANS} font-size="38" '
+                  f'font-weight="800" fill="{AMEIXA}" letter-spacing="-1">{esc(txt)}{extra}</text></g>')
+        c += (f'<g opacity="1">{appear(1, 1.5)}<line x1="172" y1="352" x2="212" y2="352" stroke="{PITAYA}" stroke-width="3"/>'
+              f'<text x="226" y="358" {SANS} font-size="16" font-weight="600" fill="{INK2}">Gabriel Niza, Fundador &amp; CEO</text></g>')
     slides.append(c)
 
     # ---------- 3. proposta de valor ----------
-    c = label(2, "02 — PROPOSTA DE VALOR")
-    c += f'<text x="72" y="150" {SANS} font-size="32" font-weight="900" fill="{AMEIXA}" letter-spacing="-1">Por que a <tspan {SERIF} font-style="italic" font-weight="400" fill="{PITAYA}">NizaShop</tspan></text>'
-    cw, gap = 328, 36
+    c = label("02 — PROPOSTA DE VALOR")
+    c += (f'<text x="{LX}" y="{138 if mobile else 150}" {SANS} font-size="{28 if mobile else 32}" font-weight="900" fill="{AMEIXA}" '
+          f'letter-spacing="-1">Por que a {italic("NizaShop")}</text>')
     for k, (ic, tit, (l1, l2)) in enumerate(DECK["valor"]):
-        x = 72 + k * (cw + gap)
-        card = (f'<rect width="{cw}" height="196" rx="22" fill="#ffffff" stroke="{LINE}" stroke-width="1.5"/>'
-                f'<rect width="{cw}" height="4" rx="2" fill="{[PITAYA, LILAS, PESSEGO][k]}"/>'
-                f'<g transform="translate(52,60)"><circle r="28" fill="{LAVANDA}"/>{niza_icon(ic, PITAYA)}</g>'
-                f'<text x="28" y="124" {SANS} font-size="23" font-weight="800" fill="{AMEIXA}">{esc(tit)}</text>'
-                f'<text x="28" y="152" {SANS} font-size="15" fill="{INK2}">{esc(l1)}</text>'
-                f'<text x="28" y="174" {SANS} font-size="15" fill="{INK2}">{esc(l2)}</text>')
-        c += f'<g transform="translate({x},186)"><g opacity="1">{appear(2, .3 + k * .25, rise=18)}{card}</g></g>'
+        accent = [PITAYA, LILAS, PESSEGO][k]
+        if mobile:
+            cw, chh = W - 2 * LX, 124
+            card = (f'<rect width="{cw}" height="{chh}" rx="20" fill="#ffffff" stroke="{LINE}" stroke-width="1.5"/>'
+                    f'<rect width="4" height="{chh}" rx="2" fill="{accent}"/>'
+                    f'<g transform="translate(50,{chh/2})"><circle r="26" fill="{LAVANDA}"/>{niza_icon(ic, PITAYA)}</g>'
+                    f'<text x="94" y="46" {SANS} font-size="21" font-weight="800" fill="{AMEIXA}">{esc(tit)}</text>'
+                    f'<text x="94" y="74" {SANS} font-size="15" fill="{INK2}">{esc(l1)}</text>'
+                    f'<text x="94" y="96" {SANS} font-size="15" fill="{INK2}">{esc(l2)}</text>')
+            x, y = LX, 162 + k * (chh + 14)
+        else:
+            cw = 328
+            card = (f'<rect width="{cw}" height="196" rx="22" fill="#ffffff" stroke="{LINE}" stroke-width="1.5"/>'
+                    f'<rect width="{cw}" height="4" rx="2" fill="{accent}"/>'
+                    f'<g transform="translate(52,60)"><circle r="28" fill="{LAVANDA}"/>{niza_icon(ic, PITAYA)}</g>'
+                    f'<text x="28" y="124" {SANS} font-size="23" font-weight="800" fill="{AMEIXA}">{esc(tit)}</text>'
+                    f'<text x="28" y="152" {SANS} font-size="15" fill="{INK2}">{esc(l1)}</text>'
+                    f'<text x="28" y="174" {SANS} font-size="15" fill="{INK2}">{esc(l2)}</text>')
+            x, y = LX + k * (cw + 36), 186
+        c += f'<g transform="translate({x},{y})"><g opacity="1">{appear(2, .3 + k * .25, rise=18)}{card}</g></g>'
     slides.append(c)
 
     # ---------- 4. ciclo de crescimento ----------
-    c = label(3, "03 — CRESCIMENTO COM IA")
-    c += f'<text x="72" y="166" {SANS} font-size="38" font-weight="900" fill="{AMEIXA}" letter-spacing="-1">Um ciclo que</text>'
-    c += f'<text x="72" y="214" {SERIF} font-size="42" font-style="italic" fill="{PITAYA}">se retroalimenta.</text>'
-    for k, line in enumerate(DECK["ciclo_texto"]):
-        c += f'<text x="72" y="{270 + k*28}" {SANS} font-size="18" fill="{INK2}">{esc(line)}</text>'
-    fx, fy, R = 850, 262, 138
+    c = label("03 — CRESCIMENTO COM IA")
+    if mobile:
+        c += f'<text x="{LX}" y="134" {SANS} font-size="30" font-weight="900" fill="{AMEIXA}" letter-spacing="-1">Um ciclo que</text>'
+        c += f'<text x="{LX}" y="174" {SERIF} font-size="34" font-style="italic" fill="{PITAYA}">se retroalimenta.</text>'
+        fx, fy, R, pfs, pk, core_r, logo_s = W / 2, 352, 112, 13, 8, 50, 22
+        for k, line in enumerate(DECK["ciclo_texto"]):
+            c += f'<text x="{LX}" y="{530 + k*24}" {SANS} font-size="15.5" fill="{INK2}">{esc(line)}</text>'
+    else:
+        c += f'<text x="{LX}" y="166" {SANS} font-size="38" font-weight="900" fill="{AMEIXA}" letter-spacing="-1">Um ciclo que</text>'
+        c += f'<text x="{LX}" y="214" {SERIF} font-size="42" font-style="italic" fill="{PITAYA}">se retroalimenta.</text>'
+        fx, fy, R, pfs, pk, core_r, logo_s = 850, 262, 138, 14, 9, 62, 26
+        for k, line in enumerate(DECK["ciclo_texto"]):
+            c += f'<text x="{LX}" y="{270 + k*28}" {SANS} font-size="18" fill="{INK2}">{esc(line)}</text>'
     ring = (f'<circle r="{R}" fill="none" stroke="{LINE}" stroke-width="2"/>'
             f'<circle r="{R}" fill="none" stroke="{LILAS}" stroke-width="2.5" stroke-dasharray="10 14">'
             f'<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="14s" repeatCount="indefinite"/></circle>'
@@ -1130,113 +1317,136 @@ def nizashop_deck():
         mid = ang + math.pi / len(nodes)
         ax, ay = math.cos(mid) * R, math.sin(mid) * R
         ring += f'<path transform="translate({ax:.1f},{ay:.1f}) rotate({math.degrees(mid) + 90:.1f})" d="M-5 -4 L1 0 L-5 4" fill="none" stroke="{LILAS}" stroke-width="2.5" stroke-linecap="round"/>'
-        pw = len(nome) * 9 + 30
+        pw = len(nome) * pk + 28
         a0, a1 = k / len(nodes), (k + 1) / len(nodes)
-        hi = (f'<animate attributeName="fill" dur="5s" repeatCount="indefinite" calcMode="discrete" '
-              f'keyTimes="0;{a0:.3f};{a1:.3f}" values="#ffffff;{PITAYA};#ffffff"/>')
-        hit = (f'<animate attributeName="fill" dur="5s" repeatCount="indefinite" calcMode="discrete" '
-               f'keyTimes="0;{a0:.3f};{a1:.3f}" values="{AMEIXA};#ffffff;{AMEIXA}"/>')
         if k == 0:
-            hi = hi.replace(f'keyTimes="0;{a0:.3f};{a1:.3f}" values="#ffffff;{PITAYA};#ffffff"', f'keyTimes="0;{a1:.3f}" values="{PITAYA};#ffffff"')
-            hit = hit.replace(f'keyTimes="0;{a0:.3f};{a1:.3f}" values="{AMEIXA};#ffffff;{AMEIXA}"', f'keyTimes="0;{a1:.3f}" values="#ffffff;{AMEIXA}"')
+            hi = f'keyTimes="0;{a1:.3f}" values="{PITAYA};#ffffff"'
+            hit = f'keyTimes="0;{a1:.3f}" values="#ffffff;{AMEIXA}"'
+        else:
+            hi = f'keyTimes="0;{a0:.3f};{a1:.3f}" values="#ffffff;{PITAYA};#ffffff"'
+            hit = f'keyTimes="0;{a0:.3f};{a1:.3f}" values="{AMEIXA};#ffffff;{AMEIXA}"'
         ring += (f'<g transform="translate({nx:.1f},{ny:.1f})"><g opacity="1">{appear(3, .3 + k * .15)}'
-                 f'<rect x="{-pw/2:.0f}" y="-17" width="{pw:.0f}" height="34" rx="17" fill="#ffffff" stroke="{LILAS}" stroke-width="1.5">{hi}</rect>'
-                 f'<text y="5" text-anchor="middle" {SANS} font-size="14" font-weight="700" fill="{AMEIXA}">{esc(nome)}{hit}</text></g></g>')
-    core = (f'<circle r="62" fill="{AMEIXA}"/><circle r="62" fill="none" stroke="{PITAYA}" stroke-width="2" opacity=".6">'
-            f'<animate attributeName="r" values="62;78" dur="2s" repeatCount="indefinite"/>'
+                 f'<rect x="{-pw/2:.0f}" y="-17" width="{pw:.0f}" height="34" rx="17" fill="#ffffff" stroke="{LILAS}" stroke-width="1.5">'
+                 f'<animate attributeName="fill" dur="5s" repeatCount="indefinite" calcMode="discrete" {hi}/></rect>'
+                 f'<text y="5" text-anchor="middle" {SANS} font-size="{pfs}" font-weight="700" fill="{AMEIXA}">{esc(nome)}'
+                 f'<animate attributeName="fill" dur="5s" repeatCount="indefinite" calcMode="discrete" {hit}/></text></g></g>')
+    core = (f'<circle r="{core_r}" fill="{AMEIXA}"/><circle r="{core_r}" fill="none" stroke="{PITAYA}" stroke-width="2" opacity=".6">'
+            f'<animate attributeName="r" values="{core_r};{core_r + 16}" dur="2s" repeatCount="indefinite"/>'
             f'<animate attributeName="opacity" values=".6;0" dur="2s" repeatCount="indefinite"/></circle>'
-            f'<g transform="translate(-17,-12)">{mini_logo("claude", 26)}</g><g transform="translate(17,-12)">{mini_logo("googlegemini", 26)}</g>'
-            f'<text y="32" text-anchor="middle" {SANS} font-size="18" font-weight="900" fill="#fff" letter-spacing="2">IA</text>')
-    c += f'<g transform="translate({fx},{fy})">{ring}{core}</g>'
+            f'<g transform="translate({-logo_s*.65:.0f},-12)">{mini_logo("claude", logo_s)}</g>'
+            f'<g transform="translate({logo_s*.65:.0f},-12)">{mini_logo("googlegemini", logo_s)}</g>'
+            f'<text y="{core_r*.5:.0f}" text-anchor="middle" {SANS} font-size="{16 if mobile else 18}" font-weight="900" fill="#fff" letter-spacing="2">IA</text>')
+    c += f'<g transform="translate({fx:.0f},{fy})">{ring}{core}</g>'
     slides.append(c)
 
     # ---------- 5. próximos passos + assinatura ----------
-    c = label(4, "04 — PRÓXIMOS PASSOS")
-    lx0, lx1, ly = 110, 1090, 176
+    c = label("04 — PRÓXIMOS PASSOS")
     fases = DECK["fases"]
-    xs = [lx0 + k * (lx1 - lx0) / (len(fases) - 1) for k in range(len(fases))]
-    c += f'<line x1="{lx0}" y1="{ly}" x2="{lx1}" y2="{ly}" stroke="{LINE}" stroke-width="4" stroke-linecap="round"/>'
-    prog_end = (xs[1] + xs[2]) / 2 - 60
     s0, _ = span(4)
-    c += (f'<line x1="{lx0}" y1="{ly}" x2="{prog_end:.0f}" y2="{ly}" stroke="{PITAYA}" stroke-width="4" stroke-linecap="round">'
-          f'{anim("x2", [(0, lx0), (s0 + .3, lx0), (s0 + 1.6, round(prog_end)), (T, round(prog_end))], T)}</line>')
-    for k, (tit, sub, tag) in enumerate(fases):
-        x = xs[k]
+
+    def marker(tag):
         if tag == "concluída":
-            mk = (f'<circle r="15" fill="{PITAYA}"/><path d="M-6 0 L-2 5 L7 -5" fill="none" stroke="#fff" stroke-width="3" '
-                  f'stroke-linecap="round" stroke-linejoin="round"/>')
-        elif tag:
-            mk = (f'<circle r="15" fill="#fff" stroke="{PITAYA}" stroke-width="4"/><circle r="5" fill="{PITAYA}"/>'
-                  f'<circle r="15" fill="none" stroke="{PITAYA}" stroke-width="2"><animate attributeName="r" values="15;28" dur="1.6s" repeatCount="indefinite"/>'
-                  f'<animate attributeName="opacity" values=".7;0" dur="1.6s" repeatCount="indefinite"/></circle>')
-        else:
-            mk = f'<circle r="13" fill="#fff" stroke="{LILAS}" stroke-width="3"/>'
-        anchor = "start" if k == 0 else ("end" if k == len(fases) - 1 else "middle")
-        tx = -12 if k == 0 else (12 if k == len(fases) - 1 else 0)
-        txt = (f'<text x="{tx}" y="46" text-anchor="{anchor}" {SANS} font-size="12.5" font-weight="800" fill="{LILAS}" letter-spacing="1.5">FASE {k+1}</text>'
-               f'<text x="{tx}" y="72" text-anchor="{anchor}" {SANS} font-size="18" font-weight="800" fill="{AMEIXA}">{esc(tit)}</text>'
-               f'<text x="{tx}" y="96" text-anchor="{anchor}" {SANS} font-size="14" fill="{INK2}">{esc(sub)}</text>')
+            return (f'<circle r="15" fill="{PITAYA}"/><path d="M-6 0 L-2 5 L7 -5" fill="none" stroke="#fff" stroke-width="3" '
+                    f'stroke-linecap="round" stroke-linejoin="round"/>')
+        if tag:
+            return (f'<circle r="15" fill="#fff" stroke="{PITAYA}" stroke-width="4"/><circle r="5" fill="{PITAYA}"/>'
+                    f'<circle r="15" fill="none" stroke="{PITAYA}" stroke-width="2"><animate attributeName="r" values="15;28" dur="1.6s" repeatCount="indefinite"/>'
+                    f'<animate attributeName="opacity" values=".7;0" dur="1.6s" repeatCount="indefinite"/></circle>')
+        return f'<circle r="13" fill="#fff" stroke="{LILAS}" stroke-width="3"/>'
+
+    def texts(k, tit, sub, tag, anchor, tx, y_fase, y_tit, y_sub, y_tag):
+        out = (f'<text x="{tx}" y="{y_fase}" text-anchor="{anchor}" {SANS} font-size="12.5" font-weight="800" fill="{LILAS}" letter-spacing="1.5">FASE {k+1}</text>'
+               f'<text x="{tx}" y="{y_tit}" text-anchor="{anchor}" {SANS} font-size="18" font-weight="800" fill="{AMEIXA}">{esc(tit)}</text>'
+               f'<text x="{tx}" y="{y_sub}" text-anchor="{anchor}" {SANS} font-size="14" fill="{INK2}">{esc(sub)}</text>')
         if tag:
             tw = len(tag) * 7.6 + 24
             bx = {"start": tx, "middle": tx - tw / 2, "end": tx - tw}[anchor]
             col = "#2f9e6e" if tag == "concluída" else PITAYA
-            txt += (f'<rect x="{bx:.0f}" y="110" width="{tw:.0f}" height="24" rx="12" fill="{col}" fill-opacity=".12"/>'
-                    f'<text x="{bx + tw/2:.0f}" y="126" text-anchor="middle" {SANS} font-size="12" font-weight="800" fill="{col}">{esc(tag)}</text>')
-        c += f'<g transform="translate({x:.0f},{ly})"><g opacity="1">{appear(4, .2 + k * .25)}{mk}{txt}</g></g>'
-    c += f'<g opacity="1">{appear(4, 1.6)}<text x="72" y="398" {SERIF} font-size="34" font-style="italic" fill="{AMEIXA}">Obrigado.</text></g>'
+            out += (f'<rect x="{bx:.0f}" y="{y_tag}" width="{tw:.0f}" height="24" rx="12" fill="{col}" fill-opacity=".12"/>'
+                    f'<text x="{bx + tw/2:.0f}" y="{y_tag + 16}" text-anchor="middle" {SANS} font-size="12" font-weight="800" fill="{col}">{esc(tag)}</text>')
+        return out
+
+    if mobile:
+        lx, ys = 44, [128, 236, 344, 452]
+        c += f'<line x1="{lx}" y1="{ys[0]}" x2="{lx}" y2="{ys[-1]}" stroke="{LINE}" stroke-width="4" stroke-linecap="round"/>'
+        prog_end = (ys[1] + ys[2]) / 2 - 20
+        c += (f'<line x1="{lx}" y1="{ys[0]}" x2="{lx}" y2="{prog_end:.0f}" stroke="{PITAYA}" stroke-width="4" stroke-linecap="round">'
+              f'{anim("y2", [(0, ys[0]), (s0 + .3, ys[0]), (s0 + 1.6, round(prog_end)), (T, round(prog_end))], T)}</line>')
+        for k, (tit, sub, tag) in enumerate(fases):
+            c += (f'<g transform="translate({lx},{ys[k]})"><g opacity="1">{appear(4, .2 + k * .25)}{marker(tag)}'
+                  f'{texts(k, tit, sub, tag, "start", 34, -10, 13, 34, 44)}</g></g>')
+        c += f'<g opacity="1">{appear(4, 1.6)}<text x="{LX}" y="584" {SERIF} font-size="28" font-style="italic" fill="{AMEIXA}">Obrigado.</text></g>'
+        sig_w, sig_base, sig_line, sig_cap = 200, 588, 606, 624
+    else:
+        lx0, lx1, ly = 110, 1090, 176
+        xs = [lx0 + k * (lx1 - lx0) / (len(fases) - 1) for k in range(len(fases))]
+        c += f'<line x1="{lx0}" y1="{ly}" x2="{lx1}" y2="{ly}" stroke="{LINE}" stroke-width="4" stroke-linecap="round"/>'
+        prog_end = (xs[1] + xs[2]) / 2 - 60
+        c += (f'<line x1="{lx0}" y1="{ly}" x2="{prog_end:.0f}" y2="{ly}" stroke="{PITAYA}" stroke-width="4" stroke-linecap="round">'
+              f'{anim("x2", [(0, lx0), (s0 + .3, lx0), (s0 + 1.6, round(prog_end)), (T, round(prog_end))], T)}</line>')
+        for k, (tit, sub, tag) in enumerate(fases):
+            anchor = "start" if k == 0 else ("end" if k == len(fases) - 1 else "middle")
+            tx = -12 if k == 0 else (12 if k == len(fases) - 1 else 0)
+            c += (f'<g transform="translate({xs[k]:.0f},{ly})"><g opacity="1">{appear(4, .2 + k * .25)}{marker(tag)}'
+                  f'{texts(k, tit, sub, tag, anchor, tx, 46, 72, 96, 110)}</g></g>')
+        c += f'<g opacity="1">{appear(4, 1.6)}<text x="{LX}" y="398" {SERIF} font-size="34" font-style="italic" fill="{AMEIXA}">Obrigado.</text></g>'
+        sig_w, sig_base, sig_line, sig_cap = 330, 382, 415, 433
     sig_src = (LOGOS / "assinatura.svg").read_text()
     vb = [float(v) for v in re.search(r'viewBox="([^"]+)"', sig_src).group(1).split()]
     sig_d = re.search(r'<path d="([^"]+)"', sig_src).group(1)
-    sig_w = 330
     k = sig_w / vb[2]
-    sx, base = W - 72 - sig_w, 382
-    c += (f'<clipPath id="sig"><rect x="{sx - 10}" y="300" height="130" width="{sig_w + 20}">'
+    sx = W - LX - sig_w
+    c += (f'<clipPath id="sig"><rect x="{sx - 10}" y="{sig_base - 82}" height="{sig_w * .4 + 50:.0f}" width="{sig_w + 20}">'
           f'{anim("width", [(0, 0), (s0 + 1.2, 0), (s0 + 2.8, sig_w + 20), (T, sig_w + 20)], T)}</rect></clipPath>'
-          f'<g clip-path="url(#sig)"><path transform="translate({sx - vb[0]*k:.1f},{base}) scale({k:.4f})" d="{sig_d}" '
+          f'<g clip-path="url(#sig)"><path transform="translate({sx - vb[0]*k:.1f},{sig_base}) scale({k:.4f})" d="{sig_d}" '
           f'fill="{AMEIXA}" stroke="{AMEIXA}" stroke-width="10" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0">'
           f'{anim("stroke-dashoffset", [(0, 1), (s0 + 1.2, 1), (s0 + 2.6, 0), (T, 0)], T)}'
           f'{anim("fill-opacity", [(0, 0), (s0 + 2.0, 0), (s0 + 2.9, 1), (T, 1)], T)}</path></g>'
-          f'<line x1="{sx}" y1="415" x2="{W-72}" y2="415" stroke="{LINE}" stroke-width="1.5"/>'
-          f'<text x="{W-72}" y="433" text-anchor="end" {SANS} font-size="13" font-weight="600" fill="{INK2}">Fundador &amp; CEO, NizaShop</text>')
+          f'<line x1="{sx}" y1="{sig_line}" x2="{W - LX}" y2="{sig_line}" stroke="{LINE}" stroke-width="1.5"/>'
+          f'<text x="{W - LX}" y="{sig_cap}" text-anchor="end" {SANS} font-size="13" font-weight="600" fill="{INK2}">Fundador &amp; CEO, NizaShop</text>')
     slides.append(c)
 
     # ---------- moldura, barra superior, contador e progresso ----------
     o = (f'<rect width="{W}" height="{H}" rx="22" fill="{PAPER}"/>'
          f'<rect x=".75" y=".75" width="{W-1.5}" height="{H-1.5}" rx="22" fill="none" stroke="{LINE}" stroke-width="1.5"/>'
          f'<circle cx="{W-80}" cy="{H-40}" r="220" fill="{LAVANDA}" opacity=".5"/>')
-    o += (f'<g transform="translate(28,16) scale(.39)"><rect width="64" height="64" rx="18" fill="{AMEIXA}"/>'
-          f'<path d="{n_path}" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><circle cx="42.5" cy="17" r="4.2" fill="{PITAYA}"/></g>'
-          f'<text x="66" y="35" {SANS} font-size="14" font-weight="700" fill="{AMEIXA}">{esc(DECK["titulo"])}</text>'
-          f'<line x1="0" y1="56" x2="{W}" y2="56" stroke="{LINE}" stroke-width="1.5"/>')
+    sym_k, title_x, title = (.36, 50, DECK["titulo_m"]) if mobile else (.39, 66, DECK["titulo"])
+    o += (f'<g transform="translate({16 if mobile else 28},{14 if mobile else 16}) scale({sym_k})">{symbol}</g>'
+          f'<text x="{title_x}" y="{32 if mobile else 35}" {SANS} font-size="{13 if mobile else 14}" font-weight="700" fill="{AMEIXA}">{esc(title)}</text>'
+          f'<line x1="0" y1="{TOPBAR}" x2="{W}" y2="{TOPBAR}" stroke="{LINE}" stroke-width="1.5"/>')
     for i in range(N):
         s0, e = span(i)
         if i == 0:
             op = f'keyTimes="0;{e/T:.4f}" values="1;0"'
         else:
             op = f'keyTimes="0;{s0/T:.4f};{min(e/T, 1):.4f}" values="0;1;0"' if e < T else f'keyTimes="0;{s0/T:.4f}" values="0;1"'
-        o += (f'<text x="{W-28}" y="35" text-anchor="end" {MONO} font-size="14" fill="{INK2}" opacity="{1 if i == 0 else 0}">'
+        o += (f'<text x="{W - (16 if mobile else 28)}" y="{32 if mobile else 35}" text-anchor="end" {MONO} font-size="{13 if mobile else 14}" fill="{INK2}" opacity="{1 if i == 0 else 0}">'
               f'<tspan fill="{AMEIXA}" font-weight="700">{i+1:02d}</tspan> / {N:02d}'
               f'<animate attributeName="opacity" dur="{T}s" repeatCount="indefinite" calcMode="discrete" {op}/></text>')
-    seg_g = 8
-    sw = (W - 56 - (N - 1) * seg_g) / N
+    seg_g, mx = 8, (16 if mobile else 28)
+    sw = (W - 2 * mx - (N - 1) * seg_g) / N
+    py = H - 24
     for i in range(N):
         s0, e = span(i)
-        x = 28 + i * (sw + seg_g)
+        x = mx + i * (sw + seg_g)
         pts = [(0, 0), (s0, 0), (e, round(sw, 1))] + ([] if e >= T else [(T, round(sw, 1))])
-        o += (f'<rect x="{x:.1f}" y="446" width="{sw:.1f}" height="4" rx="2" fill="{LINE}"/>'
-              f'<rect x="{x:.1f}" y="446" width="{sw if i == 0 else 0:.1f}" height="4" rx="2" fill="{PITAYA}">{anim("width", pts, T)}</rect>')
-    o += f'<clipPath id="area"><rect x="0" y="57" width="{W}" height="380"/></clipPath><g clip-path="url(#area)">'
+        o += (f'<rect x="{x:.1f}" y="{py}" width="{sw:.1f}" height="4" rx="2" fill="{LINE}"/>'
+              f'<rect x="{x:.1f}" y="{py}" width="{sw if i == 0 else 0:.1f}" height="4" rx="2" fill="{PITAYA}">{anim("width", pts, T)}</rect>')
+    o += f'<clipPath id="area"><rect x="0" y="{TOPBAR + 1}" width="{W}" height="{H - TOPBAR - 34}"/></clipPath><g clip-path="url(#area)">'
     for i, c in enumerate(slides):
         op, tr = slide_win(i)
         o += f'<g opacity="{1 if i == 0 else 0}">{op}<g>{tr}{c}</g></g>'
     o += '</g>'
-    save("nizashop-deck.svg", svg(W, H, o, GEM))
+    save(mname("nizashop-deck.svg", mobile), svg(W, H, o, GEM))
 
 
 def nizashop():
-    nizashop_hero(); nizashop_pilares(); nizashop_paleta(); nizashop_card(); nizashop_deck(); nizashop_bento()
+    for m in (False, True):
+        nizashop_hero(m); nizashop_pilares(m); nizashop_paleta(m); nizashop_card(m); nizashop_deck(m); nizashop_bento(m)
 
 
 if __name__ == "__main__":
-    hero(); titles(); claude_md(); stack(); projects(); walk(); footer(); nizashop()
+    for m in (False, True):  # versão computador e versão celular (*-m.svg)
+        hero(m); titles(m); claude_md(m); stack(m); projects(m)
+    walk(); footer(); nizashop()
     print("SVGs gerados em", OUT)

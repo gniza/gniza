@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/abertura.svg" alt="NizaShop. Fundador e CEO: Gabriel Niza" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/nizashop/assets/abertura-m.svg"><img src="assets/abertura.svg" alt="NizaShop. Fundador e CEO: Gabriel Niza" width="100%"></picture>
 
 <br><br>
 
@@ -16,12 +16,12 @@
 
 A **NizaShop** é uma loja na **Shopee** feita para quem gosta de comprar bem: produtos escolhidos a dedo, preço justo, envio rápido e cada pedido embalado com carinho.
 
-Por trás da loja está **[Gabriel Niza](https://github.com/gniza)**, **fundador e CEO**, que cuida de tudo: da curadoria dos produtos ao tráfego com IA que leva a loja até quem procura por ela.
+Por trás da loja está **[Gabriel Niza](https://github.com/gniza)**, **fundador e CEO**, que cuida de tudo: da curadoria dos produtos ao atendimento.
 
 A loja foi criada com a ajuda de três ferramentas de IA: **[Claude](https://claude.ai)**, **[Gemini](https://gemini.google.com)** e **[TryBloom](https://www.trybloom.ai)**.
 
 <div align="center">
-<img src="assets/pilares.svg" alt="Curadoria, preço justo, envio rápido e feito com carinho" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/nizashop/assets/pilares-m.svg"><img src="assets/pilares.svg" alt="Curadoria, preço justo, envio rápido e feito com carinho" width="100%"></picture>
 </div>
 
 ## 👤 Fundador & CEO
@@ -31,7 +31,7 @@ A loja foi criada com a ajuda de três ferramentas de IA: **[Claude](https://cla
     <td width="96"><img src="assets/logos/NizaShop-simbolo-principal.svg" width="80" alt="Símbolo da NizaShop"></td>
     <td>
       <b>Gabriel Niza</b>, fundador e CEO da NizaShop<br>
-      Desenvolvedor web e especialista em tráfego com IA na Shopee.<br>
+      Desenvolvedor web e <b>vendedor na Shopee</b>.<br>
       <a href="https://github.com/gniza">github.com/gniza</a>
     </td>
   </tr>
@@ -67,7 +67,7 @@ A loja foi criada com a ajuda de três ferramentas de IA: **[Claude](https://cla
 <div align="center">
 <sub>Arquivos vetoriais de cada versão em <a href="assets/logos/">assets/logos/</a>.</sub>
 <br><br>
-<img src="assets/paleta.svg" alt="Paleta: ameixa, pitaya, pêssego, lavanda, lilás e noite" width="100%">
+<picture><source media="(max-width: 640px)" srcset="https://raw.githubusercontent.com/gniza/gniza/main/nizashop/assets/paleta-m.svg"><img src="assets/paleta.svg" alt="Paleta: ameixa, pitaya, pêssego, lavanda, lilás e noite" width="100%"></picture>
 </div>
 
 ## 📦 Kit de embalagem
